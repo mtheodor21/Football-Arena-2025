@@ -103,7 +103,7 @@ class Antrenor {
     int varsta;
 
     public:
-    Antrenor(const std::string &Nume,const std::string &Prenume,const int &varsta) {
+    Antrenor(const std::string &Nume,const std::string &Prenume,const int &varsta, const std::string &Nationalitate) {
         this->Nume = Nume;
         this->Prenume = Prenume;
         this->varsta = varsta;
@@ -136,14 +136,15 @@ class Echipa {
     std::string Localitate;
     int buget;
     std::string Nume_Antrenor;
+    int rating;
 
 public:
-    Echipa(const std::string &Nume,const std::string &Stadion,const int &buget) {
+    Echipa(const std::string &Nume,const std::string &Stadion,const int &buget, const int &rating, const std::string &Nume_Antrenor) {
         this->Nume = Nume;
         this->Stadion = Stadion;
         this->buget = buget;
         this->Nume_Antrenor = Nume_Antrenor;
-
+        this->rating = rating;
     }
     Echipa(const Echipa &other) {
         Nume = other.Nume;
@@ -151,8 +152,17 @@ public:
         Localitate = other.Localitate;
         buget = other.buget;
         Nume_Antrenor = other.Nume_Antrenor;
+        rating = other.rating;
 
     }
+    [[nodiscard]] std::string getNume() const {
+        return Nume;
+    }
+
+    [[nodiscard]] int getRating() const {
+        return rating;
+    }
+
     Echipa &operator=(const Echipa &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Echipa &stats) {
         os << "Nume: " << stats.Nume << std::endl;
@@ -160,7 +170,7 @@ public:
         os << "Localitate: " << stats.Localitate << std::endl;
         os << "buget: " << stats.buget << std::endl;
         os << "Nume_Antrenor: " << stats.Nume_Antrenor << std::endl;
-
+        os << "Rating echipa: " << stats.rating << std::endl;
         return os;
     }
     ~Echipa() = default;
@@ -214,6 +224,10 @@ class Arbitru {
         Prenume = other.Prenume;
         Localitate = other.Localitate;
 
+    }
+
+    [[nodiscard]]  std::string getNumeComplet() const {
+        return Nume + " " + Prenume;
     }
     Arbitru &operator=(const Arbitru &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Arbitru &stats) {
@@ -311,6 +325,107 @@ class Contract {
 
     }
     ~Contract() = default;
+};
+
+class Meci {
+    const Echipa& EchipaAcasa;
+    const Echipa& EchipaDeplasare;
+    const Arbitru& ArbitruMeci;
+    int ScorAcasa;
+    int ScorDeplasare;
+    bool simulat;
+
+    public:
+    Meci(const Echipa& Acasa, const Echipa& Deplasare, const Arbitru& ArbitruMeci)
+        : EchipaAcasa(Acasa),
+        EchipaDeplasare(Deplasare),
+        ArbitruMeci(ArbitruMeci),
+        ScorAcasa(0),
+        ScorDeplasare(0),
+        simulat(false)
+    {
+
+    }
+    void seteazaRezultat(int GoluriAcasa, int GoluriDeplasare) {
+        this->ScorAcasa = GoluriAcasa;
+        this->ScorDeplasare = GoluriDeplasare;
+        this->simulat = true;
+    }
+
+    [[nodiscard]] const Echipa& getEchipaAcasa() const {
+        return EchipaAcasa;
+    }
+    [[nodiscard]] const Echipa& getEchipaDeplasare() const {
+        return EchipaDeplasare;
+    }
+
+    [[nodiscard]] int getScorAcasa() const {
+        return ScorAcasa;
+    }
+    [[nodiscard]] int getScorDeplasare() const {
+        return ScorDeplasare;
+    }
+    [[nodiscard]] bool getsimulat() const {
+        return simulat;
+    }
+
+    friend std::ostream &operator<<( std::ostream &os, const Meci &meci) {
+        os << " ~~~~~~~ SCOR MECI ~~~~~~" << std::endl;
+        os << "Acasa" << meci.EchipaAcasa.getNume() << std::endl;
+        os << "Deplasare" << meci.EchipaDeplasare.getNume() << std::endl;
+        os << "Arbitru" << meci.ArbitruMeci.getNumeComplet() << std::endl;
+
+        if (meci.simulat) {
+            os << "Rezultat" << meci.ScorAcasa << "-" << meci.ScorDeplasare << std::endl;
+        }
+        else
+        {
+         os << "Meciul nu s-a jucat inca!"<< std::endl;
+        }
+        return os;
+    }
+};
+
+class MotorSimulareMeci
+{
+public:
+    MotorSimulareMeci() = default;
+
+
+    static void SimuleazaMeci(Meci& meci) {
+        const Echipa& EchipaAcasa = meci.getEchipaAcasa();
+        const Echipa& EchipaDeplasare  = meci.getEchipaDeplasare();
+
+        int PutereAcasa = EchipaAcasa.getRating();
+        int PutereDeplasare = EchipaDeplasare.getRating();
+
+        int ScorAcasa = 0;
+        int ScorDeplasare = 0;
+
+        PutereAcasa += 5;
+
+        int SanseAcasa = PutereAcasa/10;
+        int SanseDeplasare = PutereDeplasare/10;
+
+        for (int i=0;i< SanseAcasa;i++) {
+            if (rand() % 100 < 30) {
+                ScorAcasa++;
+            }
+        }
+
+        for (int i=0;i<SanseDeplasare;i++) {
+            if (rand() % 100 < 30) {
+                ScorDeplasare++;
+            }
+        }
+        if (rand() % 100 < 10 ) {
+            if (rand() % 2 == 0)
+                ScorAcasa++;
+            else
+                ScorDeplasare++;
+        }
+    meci.seteazaRezultat(ScorAcasa, ScorDeplasare);
+    }
 };
 int main() {
 
