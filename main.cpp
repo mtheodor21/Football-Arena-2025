@@ -5,6 +5,7 @@
 #include <limits>
 #include <ctime>
 #include <stdexcept>
+#include <cstdlib>
 
 
 class Stats_Jucator {
@@ -160,11 +161,11 @@ public:
         rating = other.rating;
 
     }
-    [[nodiscard]] std::string getNume() const {
+     std::string getNume() const {
         return Nume;
     }
 
-    [[nodiscard]] int getRating() const {
+     int getRating() const {
         return rating;
     }
 
@@ -231,7 +232,7 @@ class Arbitru {
 
     }
 
-    [[nodiscard]]  std::string getNumeComplet() const {
+    std::string getNumeComplet() const {
         return Nume + " " + Prenume;
     }
     Arbitru &operator=(const Arbitru &other) = default;
@@ -357,20 +358,20 @@ class Meci {
         this->simulat = true;
     }
 
-    [[nodiscard]] const Echipa& getEchipaAcasa() const {
+    const Echipa& getEchipaAcasa() const {
         return EchipaAcasa;
     }
-    [[nodiscard]] const Echipa& getEchipaDeplasare() const {
+    const Echipa& getEchipaDeplasare() const {
         return EchipaDeplasare;
     }
 
-    [[nodiscard]] int getScorAcasa() const {
+    int getScorAcasa() const {
         return ScorAcasa;
     }
-    [[nodiscard]] int getScorDeplasare() const {
+    int getScorDeplasare() const {
         return ScorDeplasare;
     }
-    [[nodiscard]] bool getsimulat() const {
+    bool getsimulat() const {
         return simulat;
     }
 
@@ -519,9 +520,6 @@ int main() {
     std::cout << "Date incarcate: " << echipe.size() << " echipe si "
               << arbitri.size() << " arbitri.\n";
 
-    // ==========================================================
-    // 2. BUCLA PRINCIPALA A MENIULUI (identica cu cea de dinainte)
-    // ==========================================================
 
     std::cout << std::endl<< "Bun venit in Football Arena 2025 - Varianta Beta" << std::endl;
     bool ruleaza = true;
