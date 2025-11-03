@@ -161,7 +161,7 @@ public:
         rating = other.rating;
 
     }
-     std::string getNume() const {
+     const std::string& getNume() const {
         return Nume;
     }
 
@@ -381,7 +381,7 @@ class Meci {
         os << "Deplasare" << meci.EchipaDeplasare.getNume() << std::endl;
         os << "Arbitru" << meci.ArbitruMeci.getNumeComplet() << std::endl;
 
-        if (meci.simulat) {
+        if (meci.getsimulat()) {
             os << "Rezultat" << meci.ScorAcasa << "-" << meci.ScorDeplasare << std::endl;
         }
         else
