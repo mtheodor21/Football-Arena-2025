@@ -1,5 +1,10 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <fstream>
+#include <limits>
+#include <ctime>
+#include <stdexcept>
 
 
 class Stats_Jucator {
@@ -428,8 +433,167 @@ public:
     }
 };
 int main() {
+    srand(static_cast<unsigned int>(time(nullptr)));
 
-    Stats_Jucator jucator(12 , 23 , 43 , 43 , 43, 43);
-    std::cout << jucator;
+    std::vector<Echipa> echipe;
+    std::vector<Arbitru> arbitri;
+
+    std::ifstream fisier("tastatura.txt");
+    std::string identificator;
+
+    if (!fisier.is_open()) {
+        std::cout << "[EROARE CRITICA] Nu am putut deschide fisierul cu informatii!"<< std::endl;
+        return 1;
+    }
+
+    std::cout << "Se incarca datele din fisier..."<<std::endl;
+
+    // citim fisierul linie cu linie
+    while (std::getline(fisier, identificator)) {
+
+        // ignoram liniile goale sau comentariile
+        if (identificator.empty() || identificator[0] == '#') {
+            continue;
+        }
+
+        // oprim citirea la semnalul de sfarsit
+        if (identificator == "END") {
+            break;
+        }
+
+        // folosim un try-catch pentru a preveni erorile de conversie (ex daca bugetul e text)
+        try {
+            if (identificator == "ECHIPA") {
+                // citim cele 5 linii de date
+                std::string nume, stadion, bugetStr, ratingStr, antrenor;
+                std::getline(fisier, nume);
+                std::getline(fisier, stadion);
+                std::getline(fisier, bugetStr);
+                std::getline(fisier, ratingStr);
+                std::getline(fisier, antrenor);
+
+                // convertim textul in numere
+                int buget = std::stoi(bugetStr);
+                int rating = std::stoi(ratingStr);
+
+                // am creeat obiectul si il adaugam in vector
+                echipe.push_back(Echipa(nume, stadion, buget, rating, antrenor));
+
+            } else if (identificator == "ARBITRU") {
+                // citim cele 3 linii de date
+                std::string nume, prenume, localitate;
+                std::getline(fisier, nume);
+                std::getline(fisier, prenume);
+                std::getline(fisier, localitate);
+
+                // am creeat obiectul si il adaugam in vector
+                arbitri.push_back(Arbitru(nume, prenume, localitate));
+
+            }
+            else if (identificator == "ANTRENOR") {
+                std::string l1, l2, l3, l4;
+                std::getline(fisier, l1);
+                std::getline(fisier, l2);
+                std::getline(fisier, l3);
+                std::getline(fisier, l4);
+            } else if (identificator == "STAFF") {
+                std::string l1, l2, l3;
+                std::getline(fisier, l1);
+                std::getline(fisier, l2);
+                std::getline(fisier, l3);
+            } else if (identificator == "JUCATOR_INFO") {
+                std::string l;
+                for(int i=0; i<7; ++i) std::getline(fisier, l);
+            } else if (identificator == "JUCATOR_STATS") {
+                std::string l;
+                for(int i=0; i<6; ++i) std::getline(fisier, l);
+            }
+
+
+        } catch (const std::invalid_argument&) {
+            std::cerr << "[EROARE FISIER] O linie nu a putut fi convertita in numar. Sar peste intrare.\n";
+        }
+    }
+
+    fisier.close(); // Inchidem fisierul
+    std::cout << "Date incarcate: " << echipe.size() << " echipe si "
+              << arbitri.size() << " arbitri.\n";
+
+    // ==========================================================
+    // 2. BUCLA PRINCIPALA A MENIULUI (identica cu cea de dinainte)
+    // ==========================================================
+
+    std::cout << std::endl<< "Bun venit in Football Arena 2025 - Varianta Beta" << std::endl;
+    bool ruleaza = true;
+    int optiune;
+
+    while (ruleaza) {
+        // afisam optiunile
+        std::cout << std::endl<<"~~~~~~~~ MENIU PRINCIPAL ~~~~~~~~"<<std::endl;
+        std::cout << "1. Vezi lista echipelor din campionat"<<std::endl;
+        std::cout << "2. Simuleaza un meci demonstrativ (primele 2 echipe din fisier)"<< std::endl;
+        std::cout << "0. Iesire din joc"<<std::endl;
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+        std::cout << "Alegerea ta: ";
+
+        // citim optiunea
+        std::cin >> optiune;
+
+        // verificam daca input ul este valid
+        if (std::cin.fail()) {
+            std::cout << std::endl<< "[EROARE] Te rog introdu un numar valid."<<std::endl;
+            std::cin.clear(); // Reseteaza flag-ul de eroare al cin
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+
+        switch (optiune) {
+            case 1:
+                // optiunea 1, afiseaza echipele
+                std::cout << std::endl<< "~~~~~~ Echipele din Campionat  ~~~~~~"<<std::endl;
+                if(echipe.empty()) {
+                    std::cout << "Nicio echipa nu a fost incarcata.\n";
+                }
+                for (const Echipa& echipa : echipe) {
+                    std::cout << "~~~~~~~~~~" <<std::endl<< echipa;
+                }
+                break;
+
+            case 2:
+                // optiunea 2,simulam meciul
+                std::cout << std::endl <<"~~~~~~ Meci Demonstrativ ~~~~~~"<<std::endl;
+
+                // Verificam daca avem suficiente echipe si arbitri
+                if (echipe.size() < 2 || arbitri.empty()) {
+                    std::cout << "[Eroare] Nu exista suficiente date (minim 2 echipe si 1 arbitru)!"<<std::endl;
+                } else {
+                    // Cream meciul folosind primele echipe si primul arbitru din fisier
+                    Meci meciDemo(echipe[0], echipe[1], arbitri[0]);
+
+                    std::cout << "~~~~~~ Inainte de simulare ~~~~~~"<<std::endl;
+                    std::cout << meciDemo; // Afiseaza meciul (nejucat)
+
+                    // Simulam meciul
+                    MotorSimulareMeci::SimuleazaMeci(meciDemo);
+
+                    std::cout << std::endl<<" ~~~~~~Dupa simulare ~~~~~~"<<std::endl;
+                    std::cout << meciDemo; // Afiseaza meciul (jucat)
+                }
+                break;
+
+            case 0:
+                // --- Optiunea 0: Iesire ---
+                std::cout << "Multumim pentru testare. La revedere! " << std::endl;
+                ruleaza = false; // Opreste bucla while
+                break;
+
+            default:
+                // --- Orice alta optiune ---
+                std::cout <<std::endl<< "[EROARE] Optiune invalida. Te rog alege 0, 1 sau 2."<<std::endl;
+                break;
+        } // Sfarsit switch
+    } // Sfarsit while(ruleaza)
+
     return 0;
 }
+

@@ -1,2 +1,101 @@
-5
-11 22 33 44 55
+ECHIPA
+FCSB
+Arena Nationala
+5000000
+80
+Elias Charalambous
+ECHIPA
+CFR Cluj
+Gruia
+4000000
+75
+Dan Petrescu
+ECHIPA
+Rapid
+Giulesti
+3000000
+72
+Neil Lennon
+ECHIPA
+U Craiova
+Ion Oblemenco
+3500000
+74
+Costel Galca
+ECHIPA
+Dinamo
+Arcul de Triumf
+1500000
+65
+Zeljko Kopic
+ECHIPA
+Farul Constanta
+Academia Hagi
+2500000
+73
+Gheorghe Hagi
+ARBITRU
+Kovacs
+Istvan
+Carei
+ARBITRU
+Coltescu
+Sebastian
+Craiova
+ARBITRU
+Hategan
+Ovidiu
+Arad
+ARBITRU
+Feșnic
+Horațiu
+Cluj-Napoca
+JUCATOR_INFO
+Florinel
+Coman
+Romania
+75
+183
+Atacant Stanga
+Mijlocas Stanga
+JUCATOR_STATS
+88
+80
+75
+82
+45
+68
+JUCATOR_INFO
+Darius
+Olaru
+Romania
+72
+180
+Mijlocas Central
+Mijlocas Ofensiv
+JUCATOR_STATS
+80
+76
+79
+77
+65
+70
+ANTRENOR
+Gheorghe
+Hagi
+59
+Romania
+ANTRENOR
+Dan
+Petrescu
+57
+Romania
+STAFF
+Ion
+Popescu
+Fizioterapeut
+STAFF
+Vasile
+Marinescu
+Medic Sportiv
+END
