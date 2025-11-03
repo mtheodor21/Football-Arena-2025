@@ -1,36 +1,42 @@
 ECHIPA
 FCSB
 Arena Nationala
+Bucuresti
 5000000
 80
 Elias Charalambous
 ECHIPA
 CFR Cluj
 Gruia
+Cluj
 4000000
 75
 Dan Petrescu
 ECHIPA
 Rapid
 Giulesti
+Bucuresti
 3000000
 72
 Costel Galca
 ECHIPA
 U Craiova
 Ion Oblemenco
+Craiova
 3500000
 74
 Mirel Radoi
 ECHIPA
 Dinamo
 Arcul de Triumf
+Bucuresti
 1500000
 65
 Zeljko Kopic
 ECHIPA
 Farul Constanta
 Academia Hagi
+Constanta
 2500000
 73
 Gheorghe Hagi
