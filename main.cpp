@@ -28,14 +28,14 @@ public:
 
     }
 
-    Stats_Jucator(const Stats_Jucator &other) {
-        pace = other.pace;
-        shooting = other.shooting;
-        passing = other.passing;
-        dribbling = other.dribbling;
-        defending = other.defending;
-        physical = other.physical;
-
+    Stats_Jucator(const Stats_Jucator &other)
+        :pace(other.pace),
+        shooting(other.shooting),
+        passing(other.passing),
+        dribbling(other.dribbling),
+        defending(other.defending),
+        physical(other.physical)
+    {
     }
 
     Stats_Jucator &operator=(const Stats_Jucator &other) = default;
@@ -77,15 +77,16 @@ class informatii_jucator {
         this->Pozitii_alternative = Pozitii_alternative;
 
     }
-    informatii_jucator(const informatii_jucator &other) {
-        Nume = other.Nume;
-        Prenume = other.Prenume;
-        Nationalitate = other.Nationalitate;
-        Greutate = other.Greutate;
-        Inaltime = other.Inaltime;
-        Pozitie_de_baza = other.Pozitie_de_baza;
-        Pozitii_alternative = other.Pozitii_alternative;
-    }
+    informatii_jucator(const informatii_jucator &other)
+        :Nume(other.Nume),
+        Prenume(other.Prenume),
+        Nationalitate(other.Nationalitate),
+        Greutate(other.Greutate),
+        Inaltime(other.Inaltime),
+        Pozitie_de_baza(other.Pozitie_de_baza),
+        Pozitii_alternative(other.Pozitii_alternative)
+{
+}
     informatii_jucator &operator=(const informatii_jucator &other) = default;
 
     friend std::ostream &operator<<( std::ostream &os, const informatii_jucator &stats) {
@@ -117,12 +118,12 @@ class Antrenor {
 
     }
 
-    Antrenor(const Antrenor &other) {
-        Nume = other.Nume;
-        Prenume = other.Prenume;
-        Nationalitate = other.Nationalitate;
-        varsta = other.varsta;
-
+    Antrenor(const Antrenor &other)
+        :Nume(other.Nume),
+        Prenume(other.Prenume),
+        Nationalitate(other.Nationalitate),
+        varsta(other.varsta)
+    {
     }
     Antrenor &operator=(const Antrenor &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Antrenor &stats) {
@@ -152,15 +153,17 @@ public:
         this->Nume_Antrenor = Nume_Antrenor;
         this->rating = rating;
     }
-    Echipa(const Echipa &other) {
-        Nume = other.Nume;
-        Stadion = other.Stadion;
-        Localitate = other.Localitate;
-        buget = other.buget;
-        Nume_Antrenor = other.Nume_Antrenor;
-        rating = other.rating;
-
+    Echipa(const Echipa &other)
+    :Nume(other.Nume),
+    Stadion(other.Stadion),
+    Localitate(other.Localitate),
+    buget(other.buget),
+    Nume_Antrenor(other.Nume_Antrenor),
+    rating(other.rating)
+    {
     }
+
+
      const std::string& getNume() const {
         return Nume;
     }
@@ -196,11 +199,11 @@ class Staff_Medical {
         this->Specializare = Specializare;
 
     }
-    Staff_Medical(const Staff_Medical &other) {
-        Nume = other.Nume;
-        Prenume = other.Prenume;
-        Specializare = other.Specializare;
-
+    Staff_Medical(const Staff_Medical &other)
+        :Nume(other.Nume),
+        Prenume(other.Prenume),
+        Specializare(other.Specializare)
+    {
     }
     Staff_Medical &operator=(const Staff_Medical &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Staff_Medical &stats) {
@@ -226,11 +229,11 @@ class Arbitru {
         this->Localitate = Localitate;
 
     }
-    Arbitru(const Arbitru &other) {
-        Nume = other.Nume;
-        Prenume = other.Prenume;
-        Localitate = other.Localitate;
-
+    Arbitru(const Arbitru &other)
+        :Nume(other.Nume),
+        Prenume(other.Prenume),
+        Localitate(other.Localitate)
+    {
     }
 
     std::string getNumeComplet() const {
@@ -258,11 +261,11 @@ class Competitie {
         this->Reguli = Reguli;
 
     }
-    Competitie(const Competitie &other) {
-        Nume = other.Nume;
-        Echipe = other.Echipe;
-        Reguli = other.Reguli;
-
+    Competitie(const Competitie &other)
+        :Nume(other.Nume),
+        Echipe(other.Echipe),
+        Reguli(other.Reguli)
+    {
     }
     Competitie &operator=(const Competitie &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Competitie &stats) {
@@ -287,12 +290,12 @@ class Finante_Club {
         buget_Salarii = 0;
 
     }
-    Finante_Club(const Finante_Club &other) {
-        Fonduri_Totale = other.Fonduri_Totale;
-        buget_Transferuri = other.buget_Transferuri;
-        buget_Salarii = other.buget_Salarii;
+    Finante_Club(const Finante_Club &other)
+        :Fonduri_Totale(other.Fonduri_Totale),
+        buget_Transferuri(other.buget_Transferuri),
+        buget_Salarii(other.buget_Salarii)
 
-
+    {
     }
     Finante_Club &operator=(const Finante_Club &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Finante_Club &stats) {
@@ -316,11 +319,11 @@ class Contract {
         Clauza_Reziliere = 0;
 
     }
-    Contract(const Contract &other) {
-        Salariu_Persoana = other.Salariu_Persoana;
-        Data_Expirare = other.Data_Expirare;
-        Clauza_Reziliere = other.Clauza_Reziliere;
-
+    Contract(const Contract &other)
+        :Salariu_Persoana(other.Salariu_Persoana),
+        Data_Expirare(other.Data_Expirare),
+        Clauza_Reziliere(other.Clauza_Reziliere)
+    {
     }
     Contract &operator=(const Contract &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Contract &stats) {
@@ -366,12 +369,6 @@ class Meci {
         return EchipaDeplasare;
     }
 
-    int getScorAcasa() const {
-        return ScorAcasa;
-    }
-    int getScorDeplasare() const {
-        return ScorDeplasare;
-    }
     bool getsimulat() const {
         return simulat;
     }
