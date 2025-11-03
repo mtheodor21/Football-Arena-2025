@@ -169,6 +169,7 @@ public:
         return rating;
     }
 
+
     Echipa &operator=(const Echipa &other) = default;
     friend std::ostream &operator<<( std::ostream &os, const Echipa &stats) {
         os << "Nume: " << stats.Nume << std::endl;
