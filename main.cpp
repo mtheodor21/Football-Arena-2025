@@ -146,9 +146,10 @@ class Echipa {
     int rating;
 
 public:
-    Echipa(const std::string &Nume,const std::string &Stadion,const int &buget, const int &rating, const std::string &Nume_Antrenor) {
+    Echipa(const std::string &Nume,const std::string &Stadion, const std::string &Localitate,const int &buget, const int &rating, const std::string &Nume_Antrenor) {
         this->Nume = Nume;
         this->Stadion = Stadion;
+        this->Localitate = Localitate;
         this->buget = buget;
         this->Nume_Antrenor = Nume_Antrenor;
         this->rating = rating;
@@ -462,9 +463,10 @@ int main() {
         try {
             if (identificator == "ECHIPA") {
                 // citim cele 5 linii de date
-                std::string nume, stadion, bugetStr, ratingStr, antrenor;
+                std::string nume, stadion,localitate, bugetStr, ratingStr, antrenor;
                 std::getline(fisier, nume);
                 std::getline(fisier, stadion);
+                std::getline(fisier, localitate);
                 std::getline(fisier, bugetStr);
                 std::getline(fisier, ratingStr);
                 std::getline(fisier, antrenor);
@@ -474,7 +476,7 @@ int main() {
                 int rating = std::stoi(ratingStr);
 
                 // am creeat obiectul si il adaugam in vector
-                echipe.push_back(Echipa(nume, stadion, buget, rating, antrenor));
+                echipe.push_back(Echipa(nume, stadion,localitate, buget, rating, antrenor));
 
             } else if (identificator == "ARBITRU") {
                 // citim cele 3 linii de date
