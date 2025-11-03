@@ -313,11 +313,9 @@ class Contract {
     std::string Data_Expirare;
     int Clauza_Reziliere;
     public:
-    Contract() {
-        Salariu_Persoana = 0;
-        Data_Expirare = "";
-        Clauza_Reziliere = 0;
-
+    Contract()
+        : Salariu_Persoana(0), Data_Expirare(""), Clauza_Reziliere(0)
+    {
     }
     Contract(const Contract &other)
         :Salariu_Persoana(other.Salariu_Persoana),
