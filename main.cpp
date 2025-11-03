@@ -516,7 +516,7 @@ int main() {
         }
     }
 
-    fisier.close(); // Inchidem fisierul
+    fisier.close(); // inchidem fisierul
     std::cout << "Date incarcate: " << echipe.size() << " echipe si "
               << arbitri.size() << " arbitri.\n";
 
