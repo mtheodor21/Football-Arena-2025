@@ -512,15 +512,39 @@ int main() {
 
 
         } catch (const std::invalid_argument&) {
-            std::cerr << "[EROARE FISIER] O linie nu a putut fi convertita in numar. Sar peste intrare.\n";
+            std::cout << "[EROARE FISIER] O linie nu a putut fi convertita in numar. Sar peste intrare."<<std::endl;
         }
     }
 
     fisier.close(); // inchidem fisierul
     std::cout << "Date incarcate: " << echipe.size() << " echipe si "
-              << arbitri.size() << " arbitri.\n";
+              << arbitri.size() << " arbitri."<< std::endl;
 
+    // bloc pt rezolvarea erorilor github actions
+    if (std::getenv("CI") != nullptr)
+    {
+        // suntem in github actions
+        std::cout << std::endl<< "Suntem in github actions.Testam programul..."<<std::endl;
 
+        if (echipe.size() < 2 || arbitri.empty()) {
+            std::cout << "[EROARE] Nu exista suficiente date (minim 2 echipe si 1 arbitru)!"<<std::endl;
+            return 1; // eșueaza build ul dacă datele nu s au încarcat
+        }
+
+        Meci meciDemo(echipe[0], echipe[1], arbitri[0]);
+        std::cout << "~~~~~~ Inainte de simulare ~~~~~~"<<std::endl;
+        std::cout << meciDemo;
+
+        MotorSimulareMeci::SimuleazaMeci(meciDemo);
+
+        std::cout << std::endl<<" ~~~~~~Dupa simulare ~~~~~~"<<std::endl;
+        std::cout << meciDemo;
+
+        std::cout <<std::endl<< "Test complet."<<std::endl;
+        return 0;
+    }
+
+else {
     std::cout << std::endl<< "Bun venit in Football Arena 2025 - Varianta Beta" << std::endl;
     bool ruleaza = true;
     int optiune;
@@ -591,7 +615,6 @@ int main() {
                 break;
         } // Sfarsit switch
     } // Sfarsit while(ruleaza)
-
+}
     return 0;
 }
-
