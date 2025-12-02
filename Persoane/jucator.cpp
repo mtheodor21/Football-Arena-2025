@@ -1,5 +1,6 @@
 #include "jucator.h"
-#include "../Exceptii/Exceptii.h"
+// CORECTIE: Litere mici la fisier
+#include "../Exceptii/exceptii.h"
 
 Jucator::Jucator(const std::string& nume, const std::string& prenume, int rating, std::string pozitie, int nr)
     : Persoana(nume, prenume), ratingGeneral(rating), pozitie(pozitie), numarTricou(nr) {
@@ -11,15 +12,13 @@ Jucator::Jucator(const std::string& nume, const std::string& prenume, int rating
 
 Jucator::Jucator(const Jucator& other)
     : Persoana(other), ratingGeneral(other.ratingGeneral), pozitie(other.pozitie), numarTricou(other.numarTricou) {
-
 }
 
 Jucator* Jucator::clone() const {
-    return new Jucator(*this); // Foloseste constructorul de copiere
+    return new Jucator(*this);
 }
 
 int Jucator::calculeazaEficienta() const {
-
     return ratingGeneral;
 }
 

@@ -1,5 +1,6 @@
 #include "antrenor.h"
-#include "../Exceptii/Exceptii.h"
+// CORECTIE: Litere mici
+#include "../Exceptii/exceptii.h"
 
 Antrenor::Antrenor(const std::string& nume, const std::string& prenume, int ani, int trofee)
     : Persoana(nume, prenume), aniExperienta(ani), trofeeCastigate(trofee) {
@@ -12,7 +13,6 @@ Antrenor* Antrenor::clone() const {
 }
 
 int Antrenor::calculeazaEficienta() const {
-
     int score = (aniExperienta * 2) + (trofeeCastigate * 5);
     return (score > 100) ? 100 : score;
 }

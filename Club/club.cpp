@@ -1,13 +1,13 @@
+// CORECTIE: Toate headerele cu litere mici
 #include "club.h"
-#include "../Persoane/Jucator.h"
-#include "../Persoane/Antrenor.h"
-#include "../Persoane/Arbitru.h"
-#include "../Exceptii/Exceptii.h"
+#include "../Persoane/jucator.h"
+#include "../Persoane/antrenor.h"
+#include "../Persoane/arbitru.h"
+#include "../Exceptii/exceptii.h"
 
 Club::Club(const std::string& nume) : numeClub(nume) {
     if (nume.empty()) throw EroareDateInvalide("Numele clubului nu poate fi gol");
 }
-
 
 Club::~Club() {
     for (Persoana* p : membri) {
@@ -16,55 +16,44 @@ Club::~Club() {
     membri.clear();
 }
 
-
 Club::Club(const Club& other) : numeClub(other.numeClub) {
     for (const auto* p : other.membri) {
-
         membri.push_back(p->clone());
     }
-    std::cout << "[DEBUG] Club " << numeClub << " copiat cu succes.\n";
 }
-
 
 Club& Club::operator=(Club other) {
     swap(*this, other);
     return *this;
 }
 
-
 void swap(Club& first, Club& second) noexcept {
     using std::swap;
     swap(first.numeClub, second.numeClub);
-    swap(first.membri, second.membri); // vectorul stie sa faca swap eficient
+    swap(first.membri, second.membri);
 }
 
 void Club::adaugaMembru(const Persoana& p) {
-
     membri.push_back(p.clone());
 }
 
 void Club::afiseazaMembri() const {
     std::cout << "\n=== Membrii Clubului " << numeClub << " ===\n";
     for (const auto* p : membri) {
-
         std::cout << *p;
     }
 }
 
-
 void Club::analizeazaEchipa() const {
     std::cout << "\n--- Analiza Structura Echipa ---\n";
     for (const auto* p : membri) {
-
         if (const Jucator* j = dynamic_cast<const Jucator*>(p)) {
             std::cout << "[Jucator gasit] " << j->getNumeComplet()
                       << " joaca pe pozitia " << j->getPozitie() << "\n";
         }
-
         else if (const Antrenor* a = dynamic_cast<const Antrenor*>(p)) {
             std::cout << "[STAFF TEHNIC] " << a->getNumeComplet() << " coordoneaza echipa.\n";
         }
-
         else if (dynamic_cast<const Arbitru*>(p)) {
             std::cout << "[OFICIAL] Avem un arbitru in incinta.\n";
         }
@@ -77,7 +66,6 @@ void Club::analizeazaEchipa() const {
 int Club::getNumarJucatori() const {
     int count = 0;
     for (const auto* p : membri) {
-
         if (dynamic_cast<const Jucator*>(p) != nullptr) {
             count++;
         }

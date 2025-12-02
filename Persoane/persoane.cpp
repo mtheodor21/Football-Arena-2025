@@ -1,5 +1,6 @@
 #include "persoane.h"
-#include "../Exceptii/Exceptii.h"
+// CORECTIE: Litere mici la fisier
+#include "../Exceptii/exceptii.h"
 
 int Persoana::contorPersoane = 0;
 
@@ -23,9 +24,9 @@ Persoana::~Persoana() {
 
 void Persoana::afiseazaInformatii(std::ostream& os) const {
     os << "--------------------------------\n";
-    os << "ID Persoana: " << this << "\n"; // Afisam adresa doar ca debug
+    os << "ID Persoana: " << this << "\n";
     os << "Nume complet: " << getNumeComplet() << "\n";
-
+    // Apelam partea virtuala
     afisareDetaliata(os);
     os << "Eficienta calculata: " << calculeazaEficienta() << "/100\n";
     os << "--------------------------------\n";
@@ -35,8 +36,9 @@ std::string Persoana::getNumeComplet() const {
     return nume + " " + prenume;
 }
 
-void Persoana::afisareDetaliata(std::ostream& os) const {
-
+// CORECTIE: Am sters numele variabilei 'os' pentru a scapa de eroarea "unused parameter"
+void Persoana::afisareDetaliata(std::ostream&) const {
+    // Implementare default (poate fi goala)
 }
 
 int Persoana::getNumarPersoane() {
