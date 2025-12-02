@@ -25,6 +25,7 @@ public:
     void analizeazaEchipa() const;
 
     int getNumarJucatori() const;
+    void salveazaInFisier() const;
 };
 
 #endif

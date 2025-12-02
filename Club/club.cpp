@@ -1,9 +1,9 @@
-// CORECTIE: Toate headerele cu litere mici
 #include "club.h"
 #include "../Persoane/jucator.h"
 #include "../Persoane/antrenor.h"
 #include "../Persoane/arbitru.h"
 #include "../Exceptii/exceptii.h"
+#include <fstream> // <--- ESTENTIAL PENTRU ofstream
 
 Club::Club(const std::string& nume) : numeClub(nume) {
     if (nume.empty()) throw EroareDateInvalide("Numele clubului nu poate fi gol");
@@ -43,6 +43,29 @@ void Club::afiseazaMembri() const {
         std::cout << *p;
     }
 }
+
+// --- ACEASTA ESTE FUNCTIA CARE LIPSEA SAU ERA SCRISA GRESIT ---
+void Club::salveazaInFisier() const {
+    std::ofstream fout("informatii_club.txt");
+
+    if (!fout.is_open()) {
+        std::cerr << "[EROARE] Nu s-a putut deschide fisierul 'informatii_club.txt' pentru scriere!\n";
+        return;
+    }
+
+    fout << "=== RAPORT DETALIAT CLUB: " << numeClub << " ===\n\n";
+    fout << "Numar total membri: " << membri.size() << "\n";
+    fout << "--------------------------------\n";
+
+    for (const auto* p : membri) {
+        // Se foloseste operatorul << supraincarcat in Persoana (polimorfism)
+        fout << *p;
+    }
+
+    fout.close();
+    std::cout << "[INFO] Datele au fost salvate cu succes in fisierul 'informatii_club.txt'.\n";
+}
+// -------------------------------------------------------------
 
 void Club::analizeazaEchipa() const {
     std::cout << "\n--- Analiza Structura Echipa ---\n";
