@@ -460,7 +460,6 @@ int main() {
                     std::cout << "Comanda invalida!\n"; sleepMs(500);
             }
         }
-
     } catch (const std::exception& e) {
         std::cerr << "[CRASH JOC] " << e.what() << "\n";
         return 1;
