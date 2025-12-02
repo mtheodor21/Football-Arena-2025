@@ -1,5 +1,5 @@
 #include "persoane.h"
-// CORECTIE: Litere mici la fisier
+
 #include "../Exceptii/exceptii.h"
 
 int Persoana::contorPersoane = 0;

@@ -4,12 +4,12 @@
 #include <stdexcept>
 
 // Includem headerele conform structurii tale de fisiere (cu litere mici)
-#include "Exceptii/Exceptii.h"
+#include "Exceptii/exceptii.h"
 #include "Persoane/persoane.h"
 #include "Persoane/jucator.h"
 #include "Persoane/antrenor.h"
 #include "Persoane/arbitru.h"
-#include "Club/Club.h"
+#include "Club/club.h"
 
 // ============================================================================
 // CERINTA EXTRA: Clasa Medic definita local pentru a demonstra extensibilitatea
