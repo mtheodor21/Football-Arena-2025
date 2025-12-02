@@ -1,5 +1,4 @@
 #include "jucator.h"
-// CORECTIE: Litere mici la fisier
 #include "../Exceptii/exceptii.h"
 
 Jucator::Jucator(const std::string& nume, const std::string& prenume, int rating, std::string pozitie, int nr)

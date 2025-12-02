@@ -1,5 +1,5 @@
 #include "antrenor.h"
-// CORECTIE: Litere mici
+
 #include "../Exceptii/exceptii.h"
 
 Antrenor::Antrenor(const std::string& nume, const std::string& prenume, int ani, int trofee)
