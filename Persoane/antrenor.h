@@ -1,7 +1,7 @@
 #ifndef ANTRENOR_H
 #define ANTRENOR_H
 
-#include "Persoana.h"
+#include "persoane.h"
 
 class Antrenor : public Persoana {
     int aniExperienta;

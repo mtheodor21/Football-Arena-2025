@@ -1,7 +1,7 @@
 #ifndef ARBITRU_H
 #define ARBITRU_H
 
-#include "Persoana.h"
+#include "persoane.h"
 
 class Arbitru : public Persoana {
     int meciuriArbitrate;
