@@ -9,7 +9,6 @@ class Persoana {
 protected:
     std::string nume;
     std::string prenume;
-
     static int contorPersoane;
 
 public:
