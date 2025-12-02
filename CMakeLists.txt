@@ -50,6 +50,17 @@ include(cmake/CopyHelper.cmake)
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
 add_executable(${MAIN_EXECUTABLE_NAME}
     main.cpp
+        Exceptii/exceptii.h
+        Persoane/persoane.h
+        Persoane/persoane.cpp
+        Persoane/jucator.h
+        Persoane/jucator.cpp
+        Persoane/antrenor.h
+        Persoane/antrenor.cpp
+        Persoane/arbitru.cpp
+        Persoane/arbitru.h
+        Club/club.h
+        Club/club.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
