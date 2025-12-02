@@ -3,7 +3,8 @@
 #include "../Persoane/antrenor.h"
 #include "../Persoane/arbitru.h"
 #include "../Exceptii/exceptii.h"
-#include <fstream> // <--- ESTENTIAL PENTRU ofstream
+#include <fstream>
+#include <algorithm>
 
 Club::Club(const std::string& nume) : numeClub(nume) {
     if (nume.empty()) throw EroareDateInvalide("Numele clubului nu poate fi gol");
@@ -39,12 +40,11 @@ void Club::adaugaMembru(const Persoana& p) {
 
 void Club::afiseazaMembri() const {
     std::cout << "\n=== Membrii Clubului " << numeClub << " ===\n";
-    for (const auto* p : membri) {
+    std::for_each(membri.begin(), membri.end(), [](const Persoana* p) {
         std::cout << *p;
-    }
+    });
 }
 
-// --- ACEASTA ESTE FUNCTIA CARE LIPSEA SAU ERA SCRISA GRESIT ---
 void Club::salveazaInFisier() const {
     std::ofstream fout("informatii_club.txt");
 
@@ -58,14 +58,12 @@ void Club::salveazaInFisier() const {
     fout << "--------------------------------\n";
 
     for (const auto* p : membri) {
-        // Se foloseste operatorul << supraincarcat in Persoana (polimorfism)
         fout << *p;
     }
 
     fout.close();
     std::cout << "[INFO] Datele au fost salvate cu succes in fisierul 'informatii_club.txt'.\n";
 }
-// -------------------------------------------------------------
 
 void Club::analizeazaEchipa() const {
     std::cout << "\n--- Analiza Structura Echipa ---\n";
@@ -87,11 +85,7 @@ void Club::analizeazaEchipa() const {
 }
 
 int Club::getNumarJucatori() const {
-    int count = 0;
-    for (const auto* p : membri) {
-        if (dynamic_cast<const Jucator*>(p) != nullptr) {
-            count++;
-        }
-    }
-    return count;
+    return std::count_if(membri.begin(), membri.end(), [](const Persoana* p) {
+        return dynamic_cast<const Jucator*>(p) != nullptr;
+    });
 }
