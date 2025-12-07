@@ -27,9 +27,8 @@
 #include "Utils/istoric.h"
 
 // ============================================================================
-// DESIGN PATTERN: OBSERVER (Sistem de Notificari/Stiri)
+// DESIGN PATTERN: OBSERVER
 // ============================================================================
-
 class IObserver {
 public:
     virtual ~IObserver() = default;
@@ -41,60 +40,41 @@ private:
     std::list<IObserver*> observatori;
 public:
     virtual ~ISubject() = default;
-
-    void ataseaza(IObserver* obs) {
-        observatori.push_back(obs);
-    }
-
-    void detaseaza(IObserver* obs) {
-        observatori.remove(obs);
-    }
-
-    void notifica(const std::string& mesaj) {
-        for(auto* obs : observatori) {
-            obs->onNotificare(mesaj);
-        }
-    }
+    void ataseaza(IObserver* obs) { observatori.push_back(obs); }
+    void detaseaza(IObserver* obs) { observatori.remove(obs); }
+    void notifica(const std::string& mesaj) { for(auto* obs : observatori) obs->onNotificare(mesaj); }
 };
 
 class NewsFeed : public IObserver {
     std::deque<std::string> stiri;
 public:
-    // Metoda impusa de interfata Observer
     void onNotificare(const std::string& mesaj) override {
         stiri.push_front("> [BREAKING] " + mesaj);
         if(stiri.size() > 8) stiri.pop_back();
     }
-
-    // --- REPARATIE: Metoda helper pentru apeluri directe ---
     void adaugaStire(const std::string& mesaj) {
-        // Redirectionam catre logica de notificare
-        // Putem adauga un prefix diferit daca e stire manuala, dar simplificam:
         stiri.push_front("> " + mesaj);
         if(stiri.size() > 8) stiri.pop_back();
     }
-
     void afiseaza() const {
-        std::cout << "\n=== NEWS FEED (Observer Pattern Active) ===\n";
+        std::cout << "\n=== NEWS FEED ===\n";
         if(stiri.empty()) std::cout << "Nicio stire recenta.\n";
         for(const auto& s : stiri) std::cout << s << "\n";
-        std::cout << "===========================================\n";
+        std::cout << "=================\n";
     }
 };
 
 // ============================================================================
-// NAMESPACE CORE & SISTEME
+// CORE SYSTEMS
 // ============================================================================
-
 namespace Core {
     constexpr long long BUGET_INITIAL = 4000000;
     constexpr int MORAL_INITIAL = 75;
     constexpr int INCREDERE_INITIALA = 80;
-    constexpr int SALARIU_LIMITA = 250000;
-    constexpr int COST_SCOUTING_EU = 50000;
-    constexpr int COST_SCOUTING_SA = 120000;
     constexpr int BONUS_VICTORIE = 100000;
     constexpr int BONUS_EGAL = 30000;
+    constexpr int COST_SCOUTING_EU = 50000;
+    constexpr int COST_SCOUTING_SA = 120000;
 
     enum class StilJoc { POSESIE, CONTRAATAC, PARK_THE_BUS, GEGENPRESS, TIKI_TAKA };
     enum class Formatie { F442, F433, F352, F532, F343 };
@@ -103,7 +83,6 @@ namespace Core {
         Formatie formatie = Formatie::F433;
         StilJoc stil = StilJoc::POSESIE;
         int agresivitate = 50;
-
         std::string getNumeFormatie() const {
             switch(formatie) {
                 case Formatie::F442: return "4-4-2 Classic";
@@ -128,27 +107,24 @@ namespace Core {
         long long datorieBanca;
         std::vector<std::string> istoric;
         int pretBilet;
-        long long venitSponsori;
 
     public:
-        Finante(long long start = BUGET_INITIAL)
-            : balans(start), datorieBanca(0), pretBilet(20), venitSponsori(0) {}
+        Finante(long long start = BUGET_INITIAL) : balans(start), datorieBanca(0), pretBilet(20) {}
 
         void tranzactie(long long suma, std::string motiv) {
             balans += suma;
             std::string semn = (suma >= 0) ? "[+] " : "[-] ";
             istoric.push_back(semn + motiv + ": " + std::to_string(std::abs(suma)) + " EUR");
             if(istoric.size() > 5) istoric.erase(istoric.begin());
-
-            if(std::abs(suma) > 500000) {
-                notifica("Miscare financiara majora: " + motiv + " (" + std::to_string(suma) + " EUR)");
-            }
+            if(std::abs(suma) > 500000) notifica("Miscare financiara: " + motiv + " (" + std::to_string(suma) + " EUR)");
         }
+
+        void platesteSalarii(const std::vector<Jucator*>& lot);
 
         void iaImprumut(long long suma) {
             datorieBanca += suma;
             balans += suma;
-            notifica("Clubul a contractat un imprumut de " + std::to_string(suma) + " EUR de la banca!");
+            notifica("Clubul a luat imprumut: " + std::to_string(suma) + " EUR");
         }
 
         void platesteRata() {
@@ -159,7 +135,7 @@ namespace Core {
                 datorieBanca -= rata;
                 if(datorieBanca <= 0) {
                     datorieBanca = 0;
-                    notifica("Datoria catre banca a fost achitata integral!");
+                    notifica("Datoria catre banca a fost achitata!");
                 }
             }
         }
@@ -168,19 +144,120 @@ namespace Core {
         int getPretBilet() const { return pretBilet; }
         long long getBalans() const { return balans; }
         long long getDatorie() const { return datorieBanca; }
-        void adaugaSponsor(long long suma) { venitSponsori += suma; }
-        void incaseazaSponsori() { if(venitSponsori > 0) tranzactie(venitSponsori, "Sponsori"); }
 
         void afiseazaRaport() const {
             std::cout << "\n$$$ FINANTE $$$\nBalans: " << balans << " EUR | Datorie: " << datorieBanca << " EUR\n";
-            std::cout << "Sponsori: " << venitSponsori << "/sapt | Bilet: " << pretBilet << " EUR\n";
+            std::cout << "Bilet: " << pretBilet << " EUR\n";
         }
     };
 }
 using namespace Core;
 
 // ============================================================================
-// GAME DATA & HELPERS
+// MODUL NOU: BUSINESS & MARKETING (CLASE NOI PENTRU PROCENTAJ C++)
+// ============================================================================
+namespace Business {
+    enum class TipSponsor { PRINCIPAL, TRICOU, STADION, SECUNDAR };
+
+    class Sponsor {
+    private:
+        std::string nume;
+        TipSponsor tip;
+        long long sumaSaptamanala;
+        int durataContract; // in saptamani
+        bool activ;
+
+    public:
+        Sponsor(std::string n, TipSponsor t, long long suma, int durata)
+            : nume(n), tip(t), sumaSaptamanala(suma), durataContract(durata), activ(true) {}
+
+        bool isActiv() const { return activ && durataContract > 0; }
+
+        long long proceseazaSaptamana() {
+            if (!activ) return 0;
+            durataContract--;
+            if (durataContract <= 0) {
+                activ = false;
+                return 0; // Tocmai a expirat
+            }
+            return sumaSaptamanala;
+        }
+
+        std::string getDetalii() const {
+            std::string tipStr = (tip == TipSponsor::PRINCIPAL ? "Principal" : (tip == TipSponsor::STADION ? "Stadion" : "Partener"));
+            return nume + " [" + tipStr + "] - " + std::to_string(sumaSaptamanala) + " EUR/sapt (" + std::to_string(durataContract) + " saptamani ramase)";
+        }
+
+        std::string getNume() const { return nume; }
+    };
+
+    class DepartamentMarketing {
+    private:
+        std::vector<Sponsor> portofoliu;
+        int reputatieComerciala; // 0-100
+
+    public:
+        DepartamentMarketing() : reputatieComerciala(50) {
+            // Sponsor default
+            portofoliu.push_back(Sponsor("BetArena", TipSponsor::TRICOU, 25000, 30));
+        }
+
+        void actualizeazaContracte(Finante& fin) {
+            long long venitTotal = 0;
+            // Folosim lambda pentru a procesa platile
+            for (auto& s : portofoliu) {
+                venitTotal += s.proceseazaSaptamana();
+            }
+
+            if (venitTotal > 0) {
+                fin.tranzactie(venitTotal, "Incasari Sponsori");
+            }
+
+            // STL Algorithm: Stergem contractele expirate
+            // remove_if muta elementele expirate la final, erase le sterge fizic
+            portofoliu.erase(
+                std::remove_if(portofoliu.begin(), portofoliu.end(),
+                    [](const Sponsor& s) { return !s.isActiv(); }),
+                portofoliu.end());
+        }
+
+        void afiseazaSponsori() const {
+            std::cout << "\n=== PORTOFOLIU SPONSORI (Reputatie: " << reputatieComerciala << ") ===\n";
+            if (portofoliu.empty()) {
+                std::cout << "Nu avem sponsori activi! Clubul pierde bani.\n";
+            } else {
+                for (const auto& s : portofoliu) {
+                    std::cout << " > " << s.getDetalii() << "\n";
+                }
+            }
+        }
+
+        void cautaSponsorNou() {
+            std::vector<std::string> companii = {"FlyEmirates", "RedBull", "Dacia", "Banca Transilvania", "Nike", "Adidas", "Dedeman"};
+            std::string nume = companii[rand() % companii.size()];
+            long long oferta = (rand() % 50 + 10) * 1000 * (1 + reputatieComerciala / 100.0);
+            int durata = rand() % 20 + 10;
+
+            std::cout << "\n[OFERTA NOUA] Compania " << nume << " ofera " << oferta << " EUR/saptamana pe " << durata << " saptamani.\n";
+            std::cout << "1. Accepta\n2. Refuza\nAlege: ";
+            int opt; std::cin >> opt;
+
+            if (opt == 1) {
+                portofoliu.push_back(Sponsor(nume, TipSponsor::SECUNDAR, oferta, durata));
+                std::cout << "Contract semnat!\n";
+                reputatieComerciala += 2;
+            } else {
+                std::cout << "Oferta refuzata.\n";
+                // Risc de scadere reputatie
+                if(rand()%100 < 30) reputatieComerciala--;
+            }
+        }
+    };
+}
+using namespace Business;
+
+// ============================================================================
+// GAME DATA
 // ============================================================================
 namespace GameData {
     struct PlayerMeta {
@@ -207,16 +284,21 @@ namespace GameData {
     }
 }
 
+void Finante::platesteSalarii(const std::vector<Jucator*>& lot) {
+    long long total = 0;
+    for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
+    tranzactie(-total, "Salarii Jucatori");
+}
+
+// Singleton Factory
 class JucatorFactory {
 private:
     JucatorFactory() {}
-
 public:
     static JucatorFactory& getInstance() {
         static JucatorFactory instance;
         return instance;
     }
-
     JucatorFactory(JucatorFactory const&) = delete;
     void operator=(JucatorFactory const&) = delete;
 
@@ -251,6 +333,8 @@ struct EchipaAI {
 NewsFeed ziar;
 Finante finante;
 Tactica tacticaCurenta;
+DepartamentMarketing marketing; // NOU: Instanta clasei noi
+
 int etapa = 1;
 int moralEchipa = MORAL_INITIAL;
 int incredereConducere = INCREDERE_INITIALA;
@@ -385,7 +469,7 @@ std::string genereazaComentariu(const std::string& echipaAtac, bool gol, bool ba
     return "Actiune periculoasa...";
 }
 
-// Clasa Wrapper pentru a simula Meciul ca un Subject care notifica Ziarul
+// Wrapper Meci
 class MeciSimulator : public ISubject {
 public:
     void ruleazaMeci(EchipaAI* noi, EchipaAI& adv) {
@@ -432,7 +516,6 @@ public:
 
         for(auto* j : titulari) GameData::getMeta(j).conditieFizica = std::max(0, GameData::getMeta(j).conditieFizica - 10);
 
-        // Notificare Observer (Ziar)
         std::string rezumat = "Rezultat Final: " + noi->nume + " " + std::to_string(scorNoi) + "-" + std::to_string(scorAdv) + " " + adv.nume;
         notifica(rezumat);
 
@@ -465,9 +548,8 @@ void simuleazaEtapa() {
     EchipaAI& adv = liga[advIdx];
     EchipaAI* noi = &liga[0];
 
-    // Folosim clasa MeciSimulator care este un Subject
     MeciSimulator meci;
-    meci.ataseaza(&ziar); // Ziarul asculta meciul
+    meci.ataseaza(&ziar);
     meci.ruleazaMeci(noi, adv);
     meci.detaseaza(&ziar);
 
@@ -482,13 +564,10 @@ void simuleazaEtapa() {
         }
     }
 
-    // Salarii (trimit notificari interne catre ziar prin clasa Finante care este deja Subject)
-    long long totalSalarii = 0;
-    for(auto* j : lot) totalSalarii += GameData::getMeta(j).salariuSaptamanal;
-    finante.tranzactie(-totalSalarii, "Salarii Jucatori");
-
+    finante.platesteSalarii(lot);
     finante.platesteRata();
-    finante.incaseazaSponsori();
+    // Aici se proceseaza contractele de marketing
+    marketing.actualizeazaContracte(finante);
 
     etapa++;
     std::cout << "\nApasa ENTER..."; std::cin.ignore(); std::cin.get();
@@ -598,6 +677,15 @@ void meniuAcademie() {
     }
 }
 
+// NOU: Meniu Marketing
+void meniuMarketing() {
+    clear();
+    marketing.afiseazaSponsori();
+    std::cout << "\n1. Cauta Sponsor Nou (Negociere)\n0. Back\n";
+    int c; std::cin >> c;
+    if(c==1) marketing.cautaSponsorNou();
+}
+
 int main() {
     srand(time(0));
     Club club("FC Politehnica");
@@ -616,7 +704,6 @@ int main() {
         std::string n, p; fin >> n >> p;
         if(tip == "JUCATOR") {
             int r, nr; std::string poz; fin >> r >> poz >> nr;
-            // Folosim Singleton Factory
             Jucator* j = JucatorFactory::getInstance().creazaJucator(n, p, r, poz, nr);
             lot.push_back(j);
             club.adaugaMembru(*j);
@@ -630,24 +717,22 @@ int main() {
     }
     fin.close();
 
-    // Initializare
     autoSelecteazaPrimul11();
     initLiga();
-    finante.adaugaSponsor(30000);
 
     std::cout << "Nume Manager: "; std::getline(std::cin, numeManager);
 
     bool running = true;
     while(running) {
         clear();
-        std::cout << "=== MANAGER PRO 2025 ===\n";
+        std::cout << "=== FOOTBALL ARENA 2025 ===\n";
         std::cout << "Club: " << numeClub << " | Manager: " << numeManager << "\n";
         finante.afiseazaRaport();
         std::cout << "Echipa: " << (echipaModificataManual ? "MANUAL" : "AUTO") << " | Rating: " << calculeazaPutereReala() << "\n";
 
         ziar.afiseaza();
 
-        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. ACADEMIE\n6. CLASAMENT\n7. SAVE & IESI\nCmd: ";
+        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. MARKETING & SPONSORI\n6. ACADEMIE\n7. CLASAMENT\n8. SAVE & IESI\nCmd: ";
         int cmd; std::cin >> cmd;
 
         switch(cmd) {
@@ -655,14 +740,15 @@ int main() {
             case 2: meniuTactica(); break;
             case 3: meniuTransferuri(); break;
             case 4: meniuFinante(); break;
-            case 5: meniuAcademie(); break;
-            case 6:
+            case 5: meniuMarketing(); break;
+            case 6: meniuAcademie(); break;
+            case 7:
                 clear();
                 std::sort(liga.begin(), liga.end(), [](auto a, auto b){ return a.puncte > b.puncte; });
                 for(int i=0; i<(int)liga.size(); ++i) std::cout << i+1 << ". " << liga[i].nume << " " << liga[i].puncte << "p\n";
                 std::cin.ignore(); std::cin.get();
                 break;
-            case 7:
+            case 8:
                 club.salveazaInFisier();
                 running = false;
                 break;
