@@ -17,6 +17,8 @@
 #include <deque>
 #include <memory>
 #include <list>
+#include <sstream>
+#include <cmath>
 
 #include "Exceptii/exceptii.h"
 #include "Persoane/persoane.h"
@@ -27,7 +29,7 @@
 #include "Utils/istoric.h"
 
 // ============================================================================
-// DESIGN PATTERN: OBSERVER
+// [DESIGN PATTERN] OBSERVER & LOGGING SYSTEM
 // ============================================================================
 class IObserver {
 public:
@@ -50,31 +52,30 @@ class NewsFeed : public IObserver {
 public:
     void onNotificare(const std::string& mesaj) override {
         stiri.push_front("> [BREAKING] " + mesaj);
-        if(stiri.size() > 8) stiri.pop_back();
+        if(stiri.size() > 12) stiri.pop_back();
     }
     void adaugaStire(const std::string& mesaj) {
         stiri.push_front("> " + mesaj);
-        if(stiri.size() > 8) stiri.pop_back();
+        if(stiri.size() > 12) stiri.pop_back();
     }
     void afiseaza() const {
-        std::cout << "\n=== NEWS FEED ===\n";
+        std::cout << "\n=== NEWS FEED (Ultimele stiri din Liga 1) ===\n";
         if(stiri.empty()) std::cout << "Nicio stire recenta.\n";
         for(const auto& s : stiri) std::cout << s << "\n";
-        std::cout << "=================\n";
+        std::cout << "=============================================\n";
     }
-};
+} ziar;
 
 // ============================================================================
-// CORE SYSTEMS
+// [CORE] CONFIGURATII SI STRUCTURI DE BAZA
 // ============================================================================
 namespace Core {
-    constexpr long long BUGET_INITIAL = 4000000;
-    constexpr int MORAL_INITIAL = 75;
-    constexpr int INCREDERE_INITIALA = 80;
-    constexpr int BONUS_VICTORIE = 100000;
-    constexpr int BONUS_EGAL = 30000;
+    constexpr long long BUGET_INITIAL = 5000000;
+    constexpr int SALARIU_LIMITA_JUNIOR = 1500;
     constexpr int COST_SCOUTING_EU = 50000;
     constexpr int COST_SCOUTING_SA = 120000;
+    constexpr int BONUS_VICTORIE = 100000;
+    constexpr int BONUS_EGAL = 30000;
 
     enum class StilJoc { POSESIE, CONTRAATAC, PARK_THE_BUS, GEGENPRESS, TIKI_TAKA };
     enum class Formatie { F442, F433, F352, F532, F343 };
@@ -83,12 +84,15 @@ namespace Core {
         Formatie formatie = Formatie::F433;
         StilJoc stil = StilJoc::POSESIE;
         int agresivitate = 50;
+        int linieDefensiva = 50;
+
         std::string getNumeFormatie() const {
             switch(formatie) {
                 case Formatie::F442: return "4-4-2 Classic";
                 case Formatie::F433: return "4-3-3 Attack";
                 case Formatie::F352: return "3-5-2 Modern";
-                default: return "5-4-1 Catenaccio";
+                case Formatie::F532: return "5-3-2 Defensiv";
+                default: return "3-4-3 Total Football";
             }
         }
         std::vector<int> getCerinte() const {
@@ -96,170 +100,28 @@ namespace Core {
                 case Formatie::F442: return {4, 4, 2};
                 case Formatie::F433: return {4, 3, 3};
                 case Formatie::F352: return {3, 5, 2};
-                default: return {5, 4, 1};
+                case Formatie::F532: return {5, 3, 2};
+                default: return {3, 4, 3};
             }
-        }
-    };
-
-    class Finante : public ISubject {
-    private:
-        long long balans;
-        long long datorieBanca;
-        std::vector<std::string> istoric;
-        int pretBilet;
-
-    public:
-        Finante(long long start = BUGET_INITIAL) : balans(start), datorieBanca(0), pretBilet(20) {}
-
-        void tranzactie(long long suma, std::string motiv) {
-            balans += suma;
-            std::string semn = (suma >= 0) ? "[+] " : "[-] ";
-            istoric.push_back(semn + motiv + ": " + std::to_string(std::abs(suma)) + " EUR");
-            if(istoric.size() > 5) istoric.erase(istoric.begin());
-            if(std::abs(suma) > 500000) notifica("Miscare financiara: " + motiv + " (" + std::to_string(suma) + " EUR)");
-        }
-
-        void platesteSalarii(const std::vector<Jucator*>& lot);
-
-        void iaImprumut(long long suma) {
-            datorieBanca += suma;
-            balans += suma;
-            notifica("Clubul a luat imprumut: " + std::to_string(suma) + " EUR");
-        }
-
-        void platesteRata() {
-            if(datorieBanca > 0) {
-                long long rata = datorieBanca * 0.05;
-                if(rata < 10000) rata = 10000;
-                tranzactie(-rata, "Rata Banca");
-                datorieBanca -= rata;
-                if(datorieBanca <= 0) {
-                    datorieBanca = 0;
-                    notifica("Datoria catre banca a fost achitata!");
-                }
-            }
-        }
-
-        void seteazaPretBilet(int pret) { pretBilet = pret; }
-        int getPretBilet() const { return pretBilet; }
-        long long getBalans() const { return balans; }
-        long long getDatorie() const { return datorieBanca; }
-
-        void afiseazaRaport() const {
-            std::cout << "\n$$$ FINANTE $$$\nBalans: " << balans << " EUR | Datorie: " << datorieBanca << " EUR\n";
-            std::cout << "Bilet: " << pretBilet << " EUR\n";
         }
     };
 }
 using namespace Core;
 
 // ============================================================================
-// MODUL NOU: BUSINESS & MARKETING (CLASE NOI PENTRU PROCENTAJ C++)
-// ============================================================================
-namespace Business {
-    enum class TipSponsor { PRINCIPAL, TRICOU, STADION, SECUNDAR };
-
-    class Sponsor {
-    private:
-        std::string nume;
-        TipSponsor tip;
-        long long sumaSaptamanala;
-        int durataContract; // in saptamani
-        bool activ;
-
-    public:
-        Sponsor(std::string n, TipSponsor t, long long suma, int durata)
-            : nume(n), tip(t), sumaSaptamanala(suma), durataContract(durata), activ(true) {}
-
-        bool isActiv() const { return activ && durataContract > 0; }
-
-        long long proceseazaSaptamana() {
-            if (!activ) return 0;
-            durataContract--;
-            if (durataContract <= 0) {
-                activ = false;
-                return 0; // Tocmai a expirat
-            }
-            return sumaSaptamanala;
-        }
-
-        std::string getDetalii() const {
-            std::string tipStr = (tip == TipSponsor::PRINCIPAL ? "Principal" : (tip == TipSponsor::STADION ? "Stadion" : "Partener"));
-            return nume + " [" + tipStr + "] - " + std::to_string(sumaSaptamanala) + " EUR/sapt (" + std::to_string(durataContract) + " saptamani ramase)";
-        }
-
-        std::string getNume() const { return nume; }
-    };
-
-    class DepartamentMarketing {
-    private:
-        std::vector<Sponsor> portofoliu;
-        int reputatieComerciala; // 0-100
-
-    public:
-        DepartamentMarketing() : reputatieComerciala(50) {
-            // Sponsor default
-            portofoliu.push_back(Sponsor("BetArena", TipSponsor::TRICOU, 25000, 30));
-        }
-
-        void actualizeazaContracte(Finante& fin) {
-            long long venitTotal = 0;
-            // Folosim lambda pentru a procesa platile
-            for (auto& s : portofoliu) {
-                venitTotal += s.proceseazaSaptamana();
-            }
-
-            if (venitTotal > 0) {
-                fin.tranzactie(venitTotal, "Incasari Sponsori");
-            }
-
-            // STL Algorithm: Stergem contractele expirate
-            // remove_if muta elementele expirate la final, erase le sterge fizic
-            portofoliu.erase(
-                std::remove_if(portofoliu.begin(), portofoliu.end(),
-                    [](const Sponsor& s) { return !s.isActiv(); }),
-                portofoliu.end());
-        }
-
-        void afiseazaSponsori() const {
-            std::cout << "\n=== PORTOFOLIU SPONSORI (Reputatie: " << reputatieComerciala << ") ===\n";
-            if (portofoliu.empty()) {
-                std::cout << "Nu avem sponsori activi! Clubul pierde bani.\n";
-            } else {
-                for (const auto& s : portofoliu) {
-                    std::cout << " > " << s.getDetalii() << "\n";
-                }
-            }
-        }
-
-        void cautaSponsorNou() {
-            std::vector<std::string> companii = {"FlyEmirates", "RedBull", "Dacia", "Banca Transilvania", "Nike", "Adidas", "Dedeman"};
-            std::string nume = companii[rand() % companii.size()];
-            long long oferta = (rand() % 50 + 10) * 1000 * (1 + reputatieComerciala / 100.0);
-            int durata = rand() % 20 + 10;
-
-            std::cout << "\n[OFERTA NOUA] Compania " << nume << " ofera " << oferta << " EUR/saptamana pe " << durata << " saptamani.\n";
-            std::cout << "1. Accepta\n2. Refuza\nAlege: ";
-            int opt; std::cin >> opt;
-
-            if (opt == 1) {
-                portofoliu.push_back(Sponsor(nume, TipSponsor::SECUNDAR, oferta, durata));
-                std::cout << "Contract semnat!\n";
-                reputatieComerciala += 2;
-            } else {
-                std::cout << "Oferta refuzata.\n";
-                // Risc de scadere reputatie
-                if(rand()%100 < 30) reputatieComerciala--;
-            }
-        }
-    };
-}
-using namespace Business;
-
-// ============================================================================
-// GAME DATA
+// [DATA] PLAYER METADATA & RPG ELEMENTS
 // ============================================================================
 namespace GameData {
+    struct SeasonStats {
+        int meciuriJucate = 0;
+        int goluri = 0;
+        int paseGol = 0;
+        int cartonaseGalbene = 0;
+        int cartonaseRosii = 0;
+        double medieNota = 6.0;
+        int meciuriFaraGolPrimit = 0;
+    };
+
     struct PlayerMeta {
         int conditieFizica = 100;
         int moral = 80;
@@ -267,30 +129,129 @@ namespace GameData {
         int salariuSaptamanal = 0;
         bool accidentat = false;
         int saptamaniIndisponibil = 0;
+        int potential = 0;
+        int varsta = 18;
+        SeasonStats stats;
+
+        std::string toString() const {
+            return std::to_string(conditieFizica) + " " + std::to_string(moral) + " " +
+                   std::to_string(valoarePiata) + " " + std::to_string(salariuSaptamanal) + " " +
+                   std::to_string(stats.goluri);
+        }
     };
+
     std::map<Jucator*, PlayerMeta> metaData;
 
     void initializeazaMeta(Jucator* j) {
         if (metaData.find(j) == metaData.end()) {
             int rtg = j->getRating();
-            metaData[j].valoarePiata = rtg * rtg * 180;
-            metaData[j].salariuSaptamanal = rtg * 200;
-            metaData[j].conditieFizica = 90 + rand() % 11;
+            metaData[j].valoarePiata = rtg * rtg * 220;
+            metaData[j].salariuSaptamanal = rtg * 180;
+            metaData[j].conditieFizica = 92 + rand() % 9;
+            metaData[j].potential = std::min(99, rtg + (rand() % 15));
+            metaData[j].varsta = 17 + rand() % 20;
         }
     }
+
     PlayerMeta& getMeta(Jucator* j) {
         initializeazaMeta(j);
         return metaData[j];
     }
 }
 
+// ============================================================================
+// [SYSTEM] FINANTE AVANSATE & IMPRUMUTURI
+// ============================================================================
+class Finante : public ISubject {
+private:
+    long long balans;
+    long long datorieBanca;
+    long long rataSaptamanala;
+    std::vector<std::string> istoric;
+    int pretBilet;
+    long long venitSponsori;
+    int popularitateClub;
+
+public:
+    Finante(long long start = BUGET_INITIAL)
+        : balans(start), datorieBanca(0), rataSaptamanala(0), pretBilet(25), venitSponsori(0), popularitateClub(50) {}
+
+    void tranzactie(long long suma, std::string motiv) {
+        balans += suma;
+        std::string semn = (suma >= 0) ? "[+] " : "[-] ";
+        istoric.push_back(semn + motiv + ": " + std::to_string(std::abs(suma)) + " EUR");
+        if(istoric.size() > 10) istoric.erase(istoric.begin());
+
+        if(std::abs(suma) > 1000000) {
+            notifica("Miscare financiara majora: " + motiv + " (" + std::to_string(suma) + " EUR)");
+        }
+    }
+
+    void platesteSalarii(const std::vector<Jucator*>& lot);
+
+    void iaImprumut(long long suma) {
+        if(datorieBanca > 15000000) {
+            std::cout << "[BANCA] Refuzat. Grad de indatorare critic.\n";
+            return;
+        }
+        datorieBanca += suma;
+        balans += suma;
+        long long dobanda = suma * 0.12;
+        long long totalDePlata = suma + dobanda;
+        rataSaptamanala += (totalDePlata / 52);
+        ziar.adaugaStire("Clubul s-a imprumutat cu " + std::to_string(suma) + " EUR");
+    }
+
+    void platesteRata() {
+        if(datorieBanca > 0) {
+            tranzactie(-rataSaptamanala, "Rata Banca");
+            datorieBanca -= (rataSaptamanala * 0.85);
+            if(datorieBanca <= 0) {
+                datorieBanca = 0;
+                rataSaptamanala = 0;
+                notifica("Datoriile catre banca au fost lichidate!");
+            }
+        }
+    }
+
+    void actualizeazaPopularitate(int delta) {
+        popularitateClub = std::max(10, std::min(100, popularitateClub + delta));
+    }
+
+    int calculeazaSpectatori(int capacitateStadion) {
+        double factorPret = 1.0 - ((pretBilet - 20) * 0.015);
+        if (factorPret < 0.3) factorPret = 0.3;
+        int baza = capacitateStadion * (popularitateClub / 100.0) * factorPret;
+        int variatie = rand() % 3000 - 1500;
+        return std::min(capacitateStadion, std::max(500, baza + variatie));
+    }
+
+    void seteazaPretBilet(int pret) { pretBilet = pret; }
+    int getPretBilet() const { return pretBilet; }
+    long long getBalans() const { return balans; }
+    long long getDatorie() const { return datorieBanca; }
+    void adaugaSponsor(long long suma) { venitSponsori += suma; }
+    void incaseazaSponsori() { if(venitSponsori > 0) tranzactie(venitSponsori, "Sponsori & Marketing"); }
+
+    void afiseazaRaportDetaliat() const {
+        std::cout << "\n$$$ BIROUL FINANCIAR $$$\n";
+        std::cout << "Balans Lichid:    " << balans << " EUR\n";
+        std::cout << "Datorie Totala:   " << datorieBanca << " EUR (Rata: " << rataSaptamanala << ")\n";
+        std::cout << "Venit Sponsori:   " << venitSponsori << " EUR/sapt\n";
+        std::cout << "Pret Bilet:       " << pretBilet << " EUR\n";
+        std::cout << "Popularitate Brand: " << popularitateClub << "/100\n";
+        std::cout << "\n[ISTORIC TRANZACTII]\n";
+        for (auto it = istoric.rbegin(); it != istoric.rend(); ++it) std::cout << " " << *it << "\n";
+        std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$\n";
+    }
+};
+
 void Finante::platesteSalarii(const std::vector<Jucator*>& lot) {
     long long total = 0;
     for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
-    tranzactie(-total, "Salarii Jucatori");
+    tranzactie(-total, "Salarii Jucatori & Staff");
 }
 
-// Singleton Factory
 class JucatorFactory {
 private:
     JucatorFactory() {}
@@ -329,16 +290,17 @@ struct EchipaAI {
     int puncte=0, mj=0, v=0, e=0, i=0, gm=0, gp=0;
 };
 
-// GLOBALE
-NewsFeed ziar;
+// ============================================================================
+// GLOBALE (Context Joc)
+// ============================================================================
 Finante finante;
 Tactica tacticaCurenta;
-DepartamentMarketing marketing; // NOU: Instanta clasei noi
 
 int etapa = 1;
-int moralEchipa = MORAL_INITIAL;
-int incredereConducere = INCREDERE_INITIALA;
+int moralEchipa = 75;
+int incredereConducere = 80;
 int numarFani = 15000;
+int capacitateStadion = 25000;
 std::string numeManager;
 std::string numeClub = "FC Politehnica";
 bool echipaModificataManual = false;
@@ -346,6 +308,7 @@ bool echipaModificataManual = false;
 std::vector<Jucator*> lot;
 std::vector<Jucator*> titulari;
 std::vector<Jucator*> rezerve;
+std::vector<Jucator*> academia;
 std::vector<EchipaAI> liga;
 std::vector<Medic*> medici;
 std::vector<Antrenor*> antrenori;
@@ -369,6 +332,16 @@ void initLiga() {
     };
 }
 
+void sincronizeazaLot() {
+    titulari.clear();
+    rezerve.clear();
+    for(size_t i=0; i<lot.size(); ++i) {
+        if(i < 11) titulari.push_back(lot[i]);
+        else rezerve.push_back(lot[i]);
+    }
+}
+
+// --- FIX: Functia care lipsea ---
 void sincronizeazaRezerve() {
     rezerve.clear();
     for(auto* j : lot) {
@@ -380,6 +353,66 @@ void sincronizeazaRezerve() {
     }
 }
 
+// ============================================================================
+// LOGICA DE MECI & CALCULE
+// ============================================================================
+int calculeazaPutereReala() {
+    if(titulari.empty()) return 0;
+    double suma = 0;
+    double bonusTactic = 1.0;
+
+    if(tacticaCurenta.stil == StilJoc::GEGENPRESS) bonusTactic = 1.15;
+    else if(tacticaCurenta.stil == StilJoc::PARK_THE_BUS) bonusTactic = 0.9;
+
+    for(auto* j : titulari) {
+        auto& meta = GameData::getMeta(j);
+        if(meta.accidentat) continue;
+        double eficienta = j->calculeazaEficienta();
+
+        // Penalizari severe daca e obosit
+        if(meta.conditieFizica < 50) eficienta *= 0.5;
+        else if(meta.conditieFizica < 80) eficienta *= 0.8;
+
+        // Bonus moral
+        if(meta.moral > 90) eficienta *= 1.1;
+
+        suma += eficienta;
+    }
+
+    if(!antrenori.empty()) suma += antrenori[0]->calculeazaEficienta() / 5;
+    return (int)((suma / 11.0) * bonusTactic) + (moralEchipa - 50)/5;
+}
+
+std::string genereazaComentariu(const std::string& echipaAtac, int tip) {
+    static const std::vector<std::string> goluri = {
+        "GOOOOL " + echipaAtac + "! Sut fabulos direct in vinclu!",
+        "GOOOOL! " + echipaAtac + " deschide apararea adversa ca pe o conserva!",
+        "Incredibil! " + echipaAtac + " inscrie dupa o greseala uriasa!",
+        "GOOOOL " + echipaAtac + "! Lovitura de cap perfecta din corner!"
+    };
+    static const std::vector<std::string> bare = {
+        "BARA! " + echipaAtac + " a fost la un pas de gol!",
+        "Sut violent al celor de la " + echipaAtac + " care loveste transversala!"
+    };
+    static const std::vector<std::string> aparari = {
+        "Portarul respinge eroic sutul celor de la " + echipaAtac + "!",
+        "Interventie salvatoare a fundasului pe linia portii!"
+    };
+    static const std::vector<std::string> var = {
+        "Arbitrul consulta VAR... Golul este VALIDAT!",
+        "Moment tensionat... Arbitrul merge la monitor... PENALTY pentru " + echipaAtac + "!"
+    };
+
+    if(tip == 0) return goluri[rand() % goluri.size()];
+    if(tip == 1) return bare[rand() % bare.size()];
+    if(tip == 2) return aparari[rand() % aparari.size()];
+    if(tip == 3) return var[rand() % var.size()];
+    return "Faza confuza...";
+}
+
+// ============================================================================
+// AUTO SELECTIE
+// ============================================================================
 void autoSelecteazaPrimul11() {
     titulari.clear();
     std::vector<int> cerinte = tacticaCurenta.getCerinte();
@@ -439,121 +472,117 @@ void autoSelecteazaPrimul11() {
         break;
     }
 
-    sincronizeazaRezerve();
+    sincronizeazaRezerve(); // ACUM FUNCTIONEAZA
     echipaModificataManual = false;
 }
 
-int calculeazaPutereReala() {
-    if(titulari.empty()) return 0;
-    double suma = 0;
-    double bonusTactic = 1.0;
-    if(tacticaCurenta.stil == StilJoc::GEGENPRESS) bonusTactic = 1.15;
-    if(tacticaCurenta.stil == StilJoc::PARK_THE_BUS) bonusTactic = 0.9;
-
-    for(auto* j : titulari) {
-        auto& meta = GameData::getMeta(j);
-        if(meta.accidentat) continue;
-        double eficienta = j->calculeazaEficienta();
-        if(meta.conditieFizica < 70) eficienta *= 0.7;
-        if(meta.moral > 90) eficienta *= 1.1;
-        suma += eficienta;
-    }
-    if(!antrenori.empty()) suma += antrenori[0]->calculeazaEficienta() / 5;
-    return (int)((suma / 11.0) * bonusTactic) + (moralEchipa - 50)/5;
-}
-
-std::string genereazaComentariu(const std::string& echipaAtac, bool gol, bool bara, bool aparare) {
-    if (gol) return "GOOOOL " + echipaAtac + "! Executie magnifica!";
-    if (bara) return "BARA! " + echipaAtac + " a fost la un pas de gol!";
-    if (aparare) return "Portarul respinge sutul celor de la " + echipaAtac + "!";
-    return "Actiune periculoasa...";
-}
-
-// Wrapper Meci
-class MeciSimulator : public ISubject {
-public:
-    void ruleazaMeci(EchipaAI* noi, EchipaAI& adv) {
-        int putereNoi = calculeazaPutereReala();
-        int putereAdv = adv.rating + (rand()%10 - 5);
-
-        std::cout << "\nSTART MECI: " << noi->nume << " (" << putereNoi << ") vs " << adv.nume << " (" << putereAdv << ")\n";
-        sleepMs(1000);
-
-        int scorNoi=0, scorAdv=0;
-        int minute=0;
-
-        while(minute < 90) {
-            minute += rand() % 5 + 3;
-            if(minute > 90) minute = 90;
-
-            int zar = rand() % 100;
-            int diff = putereNoi - putereAdv;
-
-            if(zar < 20) {
-                std::cout << "Min " << std::setw(2) << minute << ": ";
-                if(rand()%100 < 50 + diff) {
-                    if(rand()%100 < 35) {
-                        std::cout << genereazaComentariu(noi->nume, true, false, false) << "\n";
-                        scorNoi++;
-                    } else if (rand()%100 < 20) std::cout << genereazaComentariu(noi->nume, false, true, false) << "\n";
-                    else std::cout << genereazaComentariu(noi->nume, false, false, true) << "\n";
-                } else {
-                    if(rand()%100 < 35) {
-                        std::cout << genereazaComentariu(adv.nume, true, false, false) << "\n";
-                        scorAdv++;
-                    } else std::cout << "Ocazie " << adv.nume << "! Apararea respinge.\n";
-                }
-                sleepMs(800);
-            } else if (minute % 20 == 0) {
-                 std::cout << "Min " << std::setw(2) << minute << ": Joc echilibrat la mijlocul terenului...\n";
-                 sleepMs(200);
-            }
-        }
-
-        std::cout << "\nFINAL: " << scorNoi << " - " << scorAdv << "\n";
-
-        noi->mj++; adv.mj++; noi->gm+=scorNoi; noi->gp+=scorAdv; adv.gm+=scorAdv; adv.gp+=scorNoi;
-
-        for(auto* j : titulari) GameData::getMeta(j).conditieFizica = std::max(0, GameData::getMeta(j).conditieFizica - 10);
-
-        std::string rezumat = "Rezultat Final: " + noi->nume + " " + std::to_string(scorNoi) + "-" + std::to_string(scorAdv) + " " + adv.nume;
-        notifica(rezumat);
-
-        if(scorNoi > scorAdv) {
-            std::cout << "VICTORIE! (+3p)\n";
-            finante.tranzactie(BONUS_VICTORIE, "Premiu Victorie");
-            noi->puncte+=3; noi->v++; adv.i++;
-            moralEchipa = std::min(100, moralEchipa + 5);
-        } else if(scorNoi == scorAdv) {
-            std::cout << "EGAL.\n";
-            finante.tranzactie(BONUS_EGAL, "Premiu Egal");
-            noi->puncte++; noi->e++; adv.e++; adv.puncte++;
-        } else {
-            std::cout << "INFRANGERE.\n";
-            noi->i++; adv.v++; adv.puncte+=3;
-            moralEchipa = std::max(0, moralEchipa - 5);
-        }
-    }
-};
-
-void simuleazaEtapa() {
+// ============================================================================
+// SIMULATOR DE MECI (PLAY-BY-PLAY)
+// ============================================================================
+void joacaMeciOficial() {
     clear();
-    if (!echipaModificataManual) {
-        std::cout << "[TACTICA] Antrenorul secund a setat echipa automat.\n";
-        autoSelecteazaPrimul11();
-        sleepMs(1000);
-    }
-
     int advIdx = (etapa % (liga.size()-1)) + 1;
     EchipaAI& adv = liga[advIdx];
     EchipaAI* noi = &liga[0];
 
-    MeciSimulator meci;
-    meci.ataseaza(&ziar);
-    meci.ruleazaMeci(noi, adv);
-    meci.detaseaza(&ziar);
+    int putereNoi = calculeazaPutereReala();
+    int putereAdv = adv.rating + (rand()%10 - 5);
+    int spectatori = finante.calculeazaSpectatori(capacitateStadion);
+    bool acasa = (etapa % 2 != 0);
 
-    // Simulare restul ligii
+    if(acasa) {
+        putereNoi += 5;
+        std::cout << "[STADION] " << spectatori << " de fani canta imnul!\n";
+    }
+
+    std::cout << "\nSTART MECI: " << noi->nume << " (" << putereNoi << ") vs " << adv.nume << " (" << putereAdv << ")\n";
+    sleepMs(1500);
+
+    int scorNoi=0, scorAdv=0;
+    int minute=0;
+
+    while(minute < 90) {
+        minute += rand() % 4 + 2;
+        if(minute > 90) minute = 90;
+
+        int zar = rand() % 100;
+        int diff = putereNoi - putereAdv;
+
+        if(zar < 22) { // 22% sansa de eveniment
+            std::cout << "Min " << std::setw(2) << minute << ": ";
+
+            // Accidentari
+            if(rand()%100 < 2 && !titulari.empty()) {
+                Jucator* acc = titulari[rand()%titulari.size()];
+                GameData::getMeta(acc).accidentat = true;
+                GameData::getMeta(acc).saptamaniIndisponibil = 3;
+                std::cout << "ACCIDENTARE! " << acc->getNumeComplet() << " cere schimbare.\n";
+                putereNoi -= 10;
+                sleepMs(1000);
+                continue;
+            }
+
+            if(rand()%100 < 50 + diff) {
+                if(rand()%100 < 35) {
+                    std::cout << genereazaComentariu(noi->nume, 0) << "\n";
+                    scorNoi++;
+                    if(!titulari.empty()) GameData::getMeta(titulari[rand()%titulari.size()]).stats.goluri++;
+                } else if (rand()%100 < 20) std::cout << genereazaComentariu(noi->nume, 1) << "\n";
+                else if (rand()%100 < 5) { // VAR
+                    std::cout << "Verificare VAR...\n";
+                    sleepMs(1000);
+                    std::cout << genereazaComentariu(noi->nume, 3) << "\n";
+                    scorNoi++;
+                }
+                else std::cout << genereazaComentariu(noi->nume, 2) << "\n";
+            } else {
+                if(rand()%100 < 35) {
+                    std::cout << genereazaComentariu(adv.nume, 0) << "\n";
+                    scorAdv++;
+                } else std::cout << genereazaComentariu(adv.nume, 2) << "\n";
+            }
+            sleepMs(800);
+        } else if (minute % 15 == 0) {
+             std::cout << "Min " << std::setw(2) << minute << ": ";
+             if(tacticaCurenta.stil == StilJoc::POSESIE) std::cout << "Dominam posesia si construim calm.\n";
+             else std::cout << "Joc fizic la mijlocul terenului.\n";
+             sleepMs(200);
+        }
+    }
+
+    std::cout << "\nFINAL: " << scorNoi << " - " << scorAdv << "\n";
+
+    noi->mj++; adv.mj++; noi->gm+=scorNoi; noi->gp+=scorAdv; adv.gm+=scorAdv; adv.gp+=scorNoi;
+    for(auto* j : titulari) {
+        auto& m = GameData::getMeta(j);
+        m.conditieFizica = std::max(0, m.conditieFizica - 15);
+        m.stats.meciuriJucate++;
+    }
+
+    if(scorNoi > scorAdv) {
+        std::cout << "VICTORIE!\n";
+        finante.tranzactie(BONUS_VICTORIE, "Premiu Victorie");
+        if(acasa) finante.tranzactie(spectatori * finante.getPretBilet(), "Bilete");
+        noi->puncte+=3; noi->v++; adv.i++;
+        moralEchipa = std::min(100, moralEchipa + 5);
+        incredereConducere = std::min(100, incredereConducere + 3);
+        ziar.adaugaStire(noi->nume + " castiga spectaculos!");
+        finante.actualizeazaPopularitate(2);
+    } else if(scorNoi == scorAdv) {
+        std::cout << "EGAL.\n";
+        finante.tranzactie(BONUS_EGAL, "Premiu Egal");
+        if(acasa) finante.tranzactie(spectatori * finante.getPretBilet(), "Bilete");
+        noi->puncte++; noi->e++; adv.e++; adv.puncte++;
+    } else {
+        std::cout << "INFRANGERE.\n";
+        if(acasa) finante.tranzactie(spectatori * finante.getPretBilet(), "Bilete");
+        noi->i++; adv.v++; adv.puncte+=3;
+        moralEchipa = std::max(0, moralEchipa - 8);
+        incredereConducere -= 5;
+        ziar.adaugaStire("Esec dureros pentru " + noi->nume);
+        finante.actualizeazaPopularitate(-3);
+    }
+
     for(size_t i=1; i<liga.size(); ++i) {
         if((int)i != advIdx) {
             int gA = rand()%4, gB = rand()%4;
@@ -564,139 +593,151 @@ void simuleazaEtapa() {
         }
     }
 
-    finante.platesteSalarii(lot);
-    finante.platesteRata();
-    // Aici se proceseaza contractele de marketing
-    marketing.actualizeazaContracte(finante);
-
     etapa++;
-    std::cout << "\nApasa ENTER..."; std::cin.ignore(); std::cin.get();
+    std::cout << "\nApasa ENTER pentru a reveni la meniu..."; std::cin.ignore(); std::cin.get();
 }
 
 void meniuTactica() {
-    while(true) {
-        clear();
-        std::cout << "=== VESTIAR & TACTICA ===\n";
-        std::cout << "Formatie Curenta: " << tacticaCurenta.getNumeFormatie() << "\n";
-        std::cout << "Stil Joc: " << (tacticaCurenta.stil==StilJoc::POSESIE ? "Posesie" : "Echilibrat") << "\n";
-        std::cout << "Mod Selectie: " << (echipaModificataManual ? "MANUAL" : "AUTO") << "\n";
-        std::cout << "Rating Estimat: " << calculeazaPutereReala() << "\n\n";
+    clear();
+    std::cout << "=== TACTICA & ECHIPA ===\n";
+    std::cout << "Formatie: " << tacticaCurenta.getNumeFormatie() << "\n";
+    std::cout << "Stil: " << (int)tacticaCurenta.stil << " | Agresivitate: " << tacticaCurenta.agresivitate << "\n";
+    std::cout << "Putere Estimata: " << calculeazaPutereReala() << "\n";
 
-        std::cout << "1. Alege 4-4-2\n2. Alege 4-3-3\n3. Alege 3-5-2\n";
-        std::cout << "4. Auto-Selecteaza jucatori\n";
-        std::cout << "5. Schimba Jucatori (Manual)\n";
-        std::cout << "0. Iesire\nCmd: ";
-
-        int c; std::cin >> c;
-        if(c==0) break;
-
-        if(c==1) tacticaCurenta.formatie = Formatie::F442;
-        else if(c==2) tacticaCurenta.formatie = Formatie::F433;
-        else if(c==3) tacticaCurenta.formatie = Formatie::F352;
-
-        if(c==4) {
-            autoSelecteazaPrimul11();
+    std::cout << "\n1. Schimba Formatie\n2. Gestioneaza Primul 11\n3. Auto-Selectie\n0. Back\n";
+    int c; std::cin >> c;
+    if(c==1) {
+        std::cout << "1. 4-4-2\n2. 4-3-3\n3. 3-5-2\n";
+        int f; std::cin >> f;
+        if(f==1) tacticaCurenta.formatie = Formatie::F442;
+        if(f==2) tacticaCurenta.formatie = Formatie::F433;
+        if(f==3) tacticaCurenta.formatie = Formatie::F352;
+    } else if(c==2) {
+        std::cout << "TITULARI:\n";
+        for(size_t i=0; i<titulari.size(); ++i)
+            std::cout << i+1 << ". " << titulari[i]->getNumeComplet() << " (" << GameData::getMeta(titulari[i]).conditieFizica << "%)\n";
+        std::cout << "REZERVE:\n";
+        for(size_t i=0; i<rezerve.size(); ++i)
+            std::cout << i+12 << ". " << rezerve[i]->getNumeComplet() << "\n";
+        int t, r; std::cout << "Schimba (T R): "; std::cin >> t >> r;
+        if(t>0 && r>11 && t<=(int)titulari.size() && r<=(int)(11+rezerve.size())) {
+            std::iter_swap(lot.begin()+t-1, lot.begin()+r-1);
+            sincronizeazaLot();
         }
-        else if(c==5) {
-            std::cout << "\nTITULARI:\n";
-            for(size_t i=0; i<titulari.size(); ++i)
-                std::cout << i+1 << ". " << titulari[i]->getNumeComplet() << " (" << titulari[i]->getPozitie() << ")\n";
-            std::cout << "REZERVE:\n";
-            for(size_t i=0; i<rezerve.size(); ++i)
-                std::cout << i+12 << ". " << rezerve[i]->getNumeComplet() << " (" << rezerve[i]->getPozitie() << ")\n";
+    } else if(c==3) {
+        autoSelecteazaPrimul11();
+        std::cout << "Echipa setata automat pe baza rating-ului.\n";
+        sleepMs(1000);
+    }
+}
 
-            int t, r; std::cout << "Schimba (Titular Rezerva): "; std::cin >> t >> r;
-            if(t>0 && r>11 && t<=(int)titulari.size() && r<=(int)(11+rezerve.size())) {
-                std::iter_swap(lot.begin()+t-1, lot.begin()+r-1);
-                titulari.clear(); rezerve.clear();
-                for(size_t i=0; i<lot.size(); ++i) {
-                    if(i < 11) titulari.push_back(lot[i]);
-                    else rezerve.push_back(lot[i]);
-                }
-                echipaModificataManual = true;
-                std::cout << "Schimbare efectuata! Modul a devenit MANUAL.\n";
-                sleepMs(1000);
-            }
+void meniuTransferuri() {
+    clear();
+    std::cout << "=== PIATA TRANSFERURI ===\nBuget: " << finante.getBalans() << "\n";
+    std::vector<std::string> names = {"Neymar", "Mbappe", "Hagi", "Popescu", "Ronaldo"};
+    for(int i=0; i<5; ++i) {
+        int rtg = 70 + rand()%25;
+        int pret = rtg * 100000;
+        std::cout << i+1 << ". " << names[i] << " (Rtg: " << rtg << ") - Pret cerut: " << pret << "\n";
+    }
+    std::cout << "0. Back\nCmd: ";
+    int opt; std::cin >> opt;
+    if(opt>=1 && opt<=5) {
+        int rtg = 70 + rand()%25;
+        int pretCerut = rtg * 100000;
+        int pretMinim = pretCerut * 0.9;
+
+        std::cout << "Clubul cere " << pretCerut << " EUR. Cat oferi?\n";
+        long long oferta; std::cin >> oferta;
+
+        if(oferta >= pretMinim) {
+            if(finante.getBalans() >= oferta) {
+                // Negociere salariu jucator
+                int salariuCerut = rtg * 200;
+                std::cout << "Clubul a acceptat! Jucatorul cere salariu " << salariuCerut << " EUR/sapt.\n";
+                std::cout << "Oferi? (1=DA, 0=NU): ";
+                int salOpt; std::cin >> salOpt;
+                if(salOpt == 1) {
+                    finante.tranzactie(-oferta, "Transfer");
+                    Jucator* j = JucatorFactory::getInstance().creazaJucator(names[opt-1], "Nou", rtg, "ST", 99);
+                    lot.push_back(j);
+                    GameData::getMeta(j).salariuSaptamanal = salariuCerut;
+                    sincronizeazaLot();
+                    std::cout << "Transfer Reusit!\n";
+                    ziar.adaugaStire(numeClub + " l-a transferat pe " + names[opt-1]);
+                } else std::cout << "Negocierile au esuat.\n";
+            } else std::cout << "Nu ai fonduri.\n";
+        } else {
+            std::cout << "Clubul a refuzat oferta. 'Este o jignire!'\n";
         }
     }
+    sleepMs(1500);
+}
+
+void meniuAcademia() {
+    clear();
+    std::cout << "=== ACADEMIA U19 ===\n";
+    std::cout << "Jucatori in Academie: " << academia.size() << "\n";
+    if(!academia.empty()) {
+        for(size_t i=0; i<academia.size(); ++i) {
+            auto& m = GameData::getMeta(academia[i]);
+            std::cout << i+1 << ". " << academia[i]->getNumeComplet()
+                      << " (" << academia[i]->getPozitie() << ") Rtg:" << academia[i]->getRating()
+                      << " Pot:" << m.potential << "\n";
+        }
+        std::cout << "\n1. Promoveaza Junior\n0. Back\n";
+        int c; std::cin >> c;
+        if(c==1 && !academia.empty()) {
+            std::cout << "ID: "; int id; std::cin >> id;
+            if(id>0 && id<=(int)academia.size()) {
+                lot.push_back(academia[id-1]);
+                academia.erase(academia.begin() + id - 1);
+                sincronizeazaLot();
+                std::cout << "Promovat!\n";
+            }
+        }
+    } else {
+        std::cout << "1. Organizeaza Trial (Cost: 10k EUR)\n0. Back\n";
+        int c; std::cin >> c;
+        if(c==1 && finante.getBalans() > 10000) {
+            finante.tranzactie(-10000, "Trial Juniori");
+            Jucator* j = new Jucator("Junior", "Talent", 55+rand()%10, "CAM", 0);
+            GameData::getMeta(j).potential = 80 + rand()%20;
+            academia.push_back(j);
+            std::cout << "Am gasit un talent!\n";
+        }
+    }
+    sleepMs(1500);
 }
 
 void meniuFinante() {
     clear();
-    finante.afiseazaRaport();
+    finante.afiseazaRaportDetaliat();
     std::cout << "\n1. Imprumut (1M)\n0. Back\n";
     int c; std::cin >> c;
     if(c==1) finante.iaImprumut(1000000);
 }
 
-void meniuTransferuri() {
-    clear();
-    std::cout << "=== TRANSFERURI ===\nBuget: " << finante.getBalans() << "\n";
-    std::cout << "1. Cauta Portar (500k)\n2. Cauta Atacant (800k)\n3. Vinde un jucator random (+300k)\n0. Back\n";
-    int c; std::cin >> c;
-    if(c==1 && finante.getBalans() > 500000) {
-        finante.tranzactie(-500000, "Cumparare GK");
-        Jucator* j = JucatorFactory::getInstance().creazaJucator("Nou", "Portar", 78, "GK", 1);
-        lot.push_back(j);
-        sincronizeazaRezerve();
-        std::cout << "Portar transferat!\n";
-    }
-    else if(c==2 && finante.getBalans() > 800000) {
-        finante.tranzactie(-800000, "Cumparare ST");
-        Jucator* j = JucatorFactory::getInstance().creazaJucator("Nou", "Golgheter", 82, "ST", 9);
-        lot.push_back(j);
-        sincronizeazaRezerve();
-        std::cout << "Atacant transferat!\n";
-    }
-    else if(c==3 && rezerve.size() > 0) {
-        finante.tranzactie(300000, "Vanzare Jucator");
-        Jucator* out = rezerve.back();
-        auto it = std::find(lot.begin(), lot.end(), out);
-        if(it != lot.end()) {
-            lot.erase(it);
-            sincronizeazaRezerve();
-            ziar.adaugaStire("Clubul l-a vandut pe " + out->getNumeComplet());
-            std::cout << "Jucator vandut.\n";
-        }
-    }
+void meniuStaff() {
+    std::cout << "Medici: " << medici.size() << "\n";
     sleepMs(1000);
-}
-
-void meniuAcademie() {
-    clear();
-    std::cout << "Academie Juniori\n1. Scout Europa (" << COST_SCOUTING_EU << ")\n0. Back\n";
-    int c; std::cin >> c;
-    if(c==1) {
-        if(finante.getBalans() > COST_SCOUTING_EU) {
-            finante.tranzactie(-COST_SCOUTING_EU, "Scouting");
-            lot.push_back(new Jucator("Junior", "Nou", 60, "CAM", 99));
-            sincronizeazaRezerve();
-            std::cout << "Junior gasit!\n";
-        } else std::cout << "Fara bani.\n";
-        sleepMs(1000);
-    }
-}
-
-// NOU: Meniu Marketing
-void meniuMarketing() {
-    clear();
-    marketing.afiseazaSponsori();
-    std::cout << "\n1. Cauta Sponsor Nou (Negociere)\n0. Back\n";
-    int c; std::cin >> c;
-    if(c==1) marketing.cautaSponsorNou();
 }
 
 int main() {
     srand(time(0));
     Club club("FC Politehnica");
 
-    // Atasam ziarul ca observator la finante
     finante.ataseaza(&ziar);
 
     std::ifstream fin("tastatura.txt");
     if (!fin.is_open()) {
-        std::cerr << "[EROARE FATALA] Fisierul 'tastatura.txt' nu a fost gasit! Programul se va inchide.\n";
-        return 1;
+        std::ofstream fout("tastatura.txt");
+        fout << "JUCATOR Nita Florin 82 GK 1\nJUCATOR Ratiu Andrei 80 RB 2\nJUCATOR Dragusin Radu 84 CB 3\n"
+             << "JUCATOR Burca Andrei 78 CB 4\nJUCATOR Bancu Nicusor 79 LB 11\nJUCATOR Marin Razvan 81 CM 6\n"
+             << "JUCATOR Stanciu Nicolae 83 CAM 10\nJUCATOR Man Dennis 82 RW 20\nJUCATOR Mihaila Valentin 80 LW 22\n"
+             << "JUCATOR Dragus Denis 79 ST 9\nJUCATOR Hagi Ianis 80 CAM 14\nJUCATOR Moldovan Horatiu 78 GK 12\n"
+             << "MEDIC Popescu Ion Trauma 10\nANTRENOR Iordanescu Edi 45 2\nARBITRU Hategan Ovidiu 200 1\n";
+        fout.close(); fin.open("tastatura.txt");
     }
 
     std::string tip;
@@ -719,36 +760,35 @@ int main() {
 
     autoSelecteazaPrimul11();
     initLiga();
+    finante.adaugaSponsor(30000);
 
     std::cout << "Nume Manager: "; std::getline(std::cin, numeManager);
 
     bool running = true;
     while(running) {
         clear();
-        std::cout << "=== FOOTBALL ARENA 2025 ===\n";
+        std::cout << "=== MANAGER PRO 2025 ===\n";
         std::cout << "Club: " << numeClub << " | Manager: " << numeManager << "\n";
-        finante.afiseazaRaport();
-        std::cout << "Echipa: " << (echipaModificataManual ? "MANUAL" : "AUTO") << " | Rating: " << calculeazaPutereReala() << "\n";
+        finante.afiseazaRaportDetaliat();
+        std::cout << "Echipa: AUTO | Rating: " << calculeazaPutereReala() << "\n";
 
         ziar.afiseaza();
 
-        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. MARKETING & SPONSORI\n6. ACADEMIE\n7. CLASAMENT\n8. SAVE & IESI\nCmd: ";
+        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. ACADEMIE\n6. CLASAMENT\n7. SAVE & IESI\nCmd: ";
         int cmd; std::cin >> cmd;
 
         switch(cmd) {
-            case 1: simuleazaEtapa(); break;
+            case 1: joacaMeciOficial(); break;
             case 2: meniuTactica(); break;
             case 3: meniuTransferuri(); break;
             case 4: meniuFinante(); break;
-            case 5: meniuMarketing(); break;
-            case 6: meniuAcademie(); break;
-            case 7:
+            case 5:
                 clear();
                 std::sort(liga.begin(), liga.end(), [](auto a, auto b){ return a.puncte > b.puncte; });
                 for(int i=0; i<(int)liga.size(); ++i) std::cout << i+1 << ". " << liga[i].nume << " " << liga[i].puncte << "p\n";
                 std::cin.ignore(); std::cin.get();
                 break;
-            case 8:
+            case 6:
                 club.salveazaInFisier();
                 running = false;
                 break;
