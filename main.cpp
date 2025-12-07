@@ -17,27 +17,24 @@
 #include "Persoane/antrenor.h"
 #include "Persoane/arbitru.h"
 #include "Club/club.h"
+#include "Utils/istoric.h"
 
 class JucatorFactory {
 public:
     static Jucator* creazaJucator(const std::string& nume, const std::string& prenume, int rating, const std::string& pozitie, int nr) {
         if (pozitie == "GK") return new Portar(nume, prenume, rating, pozitie, nr);
-
         if (pozitie == "CB") return new FundasCentral(nume, prenume, rating, pozitie, nr);
         if (pozitie == "LB") return new FundasStanga(nume, prenume, rating, pozitie, nr);
         if (pozitie == "RB") return new FundasDreapta(nume, prenume, rating, pozitie, nr);
         if (pozitie == "LWB" || pozitie == "RWB") return new Fundas(nume, prenume, rating, pozitie, nr);
-
         if (pozitie == "CM") return new MijlocasCentral(nume, prenume, rating, pozitie, nr);
         if (pozitie == "CDM") return new MijlocasDefensiv(nume, prenume, rating, pozitie, nr);
         if (pozitie == "CAM") return new MijlocasOfensiv(nume, prenume, rating, pozitie, nr);
         if (pozitie == "LM") return new MijlocasStanga(nume, prenume, rating, pozitie, nr);
         if (pozitie == "RM") return new MijlocasDreapta(nume, prenume, rating, pozitie, nr);
-
         if (pozitie == "ST" || pozitie == "CF") return new AtacantCentral(nume, prenume, rating, pozitie, nr);
         if (pozitie == "LW") return new AtacantStanga(nume, prenume, rating, pozitie, nr);
         if (pozitie == "RW") return new AtacantDreapta(nume, prenume, rating, pozitie, nr);
-
         return new Jucator(nume, prenume, rating, pozitie, nr);
     }
 };
@@ -91,6 +88,9 @@ std::vector<EchipaAI> liga;
 DetaliiClub detaliiMele;
 std::vector<Antrenor*> staffTehnic;
 std::vector<Medic*> staffMedical;
+
+Istoric<std::string> istoricMeciuri(50);
+std::map<std::string, int> golgheteri;
 
 void clear() {
 #ifdef _WIN32
@@ -250,6 +250,31 @@ void meniuTransferuri(Club& club) {
     }
 }
 
+void afiseazaGolgheteri() {
+    clear();
+    antet("STATISTICI - TOP GOLGHETERI");
+
+    if (golgheteri.empty()) {
+        std::cout << "Inca nu s-au marcat goluri in acest sezon.\n";
+    } else {
+        std::vector<std::pair<std::string, int>> vec;
+        for (auto const& [nume, goluri] : golgheteri) {
+            vec.push_back({nume, goluri});
+        }
+
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.second > b.second;
+        });
+
+        for (const auto& p : vec) {
+            std::cout << std::left << std::setw(25) << p.first << " : " << p.second << " goluri\n";
+        }
+    }
+
+    std::cout << "\nApasa ENTER pentru a reveni...";
+    std::cin.ignore(); std::cin.get();
+}
+
 void meniuDetaliiClub(const Club& club) {
     clear();
     antet("DETALII CLUB & INFRASTRUCTURA");
@@ -295,11 +320,14 @@ void joacaEtapa() {
         if (sansa < 40) std::cout << "Joc calm la mijlocul terenului...\n";
         else if (sansa < 70) {
             if (rand() % 100 < (40 + avantaj)) {
-                std::cout << "GOOOOL POLITEHNICA! ";
-                if(!titulari.empty())
-                    std::cout << titulari[rand() % titulari.size()]->getNumeComplet() << " inscrie!\n";
-                else std::cout << "Inscriem!\n";
+                std::string marcator = "Jucator Necunoscut";
+                if(!titulari.empty()) marcator = titulari[rand() % titulari.size()]->getNumeComplet();
+
+                std::cout << "GOOOOL POLITEHNICA! Inscrie " << marcator << "!\n";
                 scorNoi++;
+
+                golgheteri[marcator]++;
+
             } else std::cout << "Ratare imensa pentru noi! Bara!\n";
         } else {
             if (rand() % 100 < (40 - avantaj)) {
@@ -307,12 +335,23 @@ void joacaEtapa() {
                 scorAdv++;
             } else std::cout << "Interventie salvatoare a portarului nostru!\n";
         }
-        sleepMs(1000);
+
+        if (rand() % 100 < 5 && !staffMedical.empty()) {
+            std::cout << "   [!] Un jucator s-a accidentat. Dr. " << staffMedical[0]->getNumeComplet()
+                      << " intra pe teren pentru ingrijiri.\n";
+            sleepMs(1000);
+            std::cout << "   [OK] Jucatorul revine in joc.\n";
+        }
+
+        sleepMs(1500);
     }
 
     std::cout << "\n----------------------------------------\n";
     std::cout << "SCOR FINAL: " << scorNoi << " - " << scorAdv << "\n";
     std::cout << "----------------------------------------\n";
+
+    std::string rezultatMeci = "Etapa " + std::to_string(etapa) + ": " + std::to_string(scorNoi) + "-" + std::to_string(scorAdv) + " vs " + adversar.nume;
+    istoricMeciuri.adaugaEveniment(rezultatMeci);
 
     noi->meciuriJucate++; adversar.meciuriJucate++;
     noi->gm += scorNoi; noi->gp += scorAdv;
@@ -372,6 +411,15 @@ void afiseazaClasament() {
     std::cin.ignore(); std::cin.get();
 }
 
+void afiseazaIstoric() {
+    clear();
+    antet("ISTORIC REZULTATE");
+    istoricMeciuri.afiseazaIstoric();
+
+    std::cout << "\nApasa ENTER...";
+    std::cin.ignore(); std::cin.get();
+}
+
 int main() {
     srand(time(0));
     initJoc();
@@ -381,18 +429,30 @@ int main() {
 
         std::ifstream fin("tastatura.txt");
         if (!fin.is_open()) {
-            throw std::runtime_error("Fisierul 'tastatura.txt' nu a fost gasit! Asigura-te ca exista si contine datele.");
+            std::ofstream fout("tastatura.txt");
+            fout << "JUCATOR Nita Florin 82 GK 1\n"
+                 << "JUCATOR Ratiu Andrei 80 RB 2\n"
+                 << "JUCATOR Dragusin Radu 84 CB 3\n"
+                 << "JUCATOR Burca Andrei 78 CB 4\n"
+                 << "JUCATOR Bancu Nicusor 79 LB 11\n"
+                 << "JUCATOR Marin Razvan 81 CM 6\n"
+                 << "JUCATOR Stanciu Nicolae 83 CAM 10\n"
+                 << "JUCATOR Man Dennis 82 RW 20\n"
+                 << "JUCATOR Mihaila Valentin 80 LW 22\n"
+                 << "JUCATOR Dragus Denis 79 ST 9\n"
+                 << "JUCATOR Hagi Ianis 80 CAM 14\n"
+                 << "JUCATOR Moldovan Horatiu 78 GK 12\n"
+                 << "JUCATOR Puscas George 75 ST 25\n"
+                 << "ANTRENOR Iordanescu Edward 45 3\n"
+                 << "MEDIC Popescu Ion Ortopedie 15\n"
+                 << "MEDIC Ionescu Maria Cardiologie 10\n"
+                 << "ARBITRU Hategan Ovidiu 200 1\n";
+            fout.close();
+            fin.open("tastatura.txt");
         }
 
         std::string tip;
         while(fin >> tip) {
-            // Ignoram liniile de comentarii care incep cu #
-            if (tip[0] == '#') {
-                std::string dummy;
-                std::getline(fin, dummy);
-                continue;
-            }
-
             std::string nume, prenume;
             fin >> nume >> prenume;
             if(tip == "JUCATOR") {
@@ -440,7 +500,8 @@ int main() {
             std::cout << " [3] TRANSFERURI (Cumpara jucatori)\n";
             std::cout << " [4] CLASAMENT LIGA 1\n";
             std::cout << " [5] BIROU (Detalii Club, Palmares, Staff, Medic)\n";
-            std::cout << " [6] SALVEAZA & IESI\n";
+            std::cout << " [6] STATISTICI (Golgheteri & Istoric)\n";
+            std::cout << " [7] SALVEAZA & IESI\n";
             std::cout << "--------------------------------------------------------------\n";
             std::cout << "Selecteaza actiunea: ";
 
@@ -453,6 +514,12 @@ int main() {
                 case 4: afiseazaClasament(); break;
                 case 5: meniuDetaliiClub(club); break;
                 case 6:
+                    std::cout << " 1. Top Golgheteri\n 2. Istoric Meciuri\n Alegere: ";
+                    int sub; std::cin >> sub;
+                    if (sub == 1) afiseazaGolgheteri();
+                    else afiseazaIstoric();
+                    break;
+                case 7:
                     club.salveazaInFisier();
                     std::cout << "Salvare realizata. La revedere!\n";
                     ruleaza = false;

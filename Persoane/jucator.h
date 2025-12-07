@@ -22,9 +22,13 @@ public:
     std::string getPozitie() const;
     int getRating() const { return ratingGeneral; }
 
+
+    friend std::istream& operator>>(std::istream& is, Jucator& j);
+
 protected:
     void afisareDetaliata(std::ostream& os) const override;
 };
+
 
 class Portar : public Jucator {
 public:

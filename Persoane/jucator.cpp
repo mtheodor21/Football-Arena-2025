@@ -1,6 +1,11 @@
 #include "jucator.h"
 #include "../Exceptii/exceptii.h"
 
+std::istream& operator>>(std::istream& is, Jucator& j) {
+    is >> j.ratingGeneral >> j.pozitie >> j.numarTricou;
+    return is;
+}
+
 Jucator::Jucator(const std::string& nume, const std::string& prenume, int rating, std::string pozitie, int nr)
     : Persoana(nume, prenume), ratingGeneral(rating), pozitie(pozitie), numarTricou(nr) {
     if (rating < 0 || rating > 100) throw EroareDateInvalide("Rating invalid (0-100).");
