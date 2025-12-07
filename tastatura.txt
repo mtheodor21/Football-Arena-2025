@@ -1,107 +1,47 @@
-ECHIPA
-FCSB
-Arena Nationala
-Bucuresti
-5000000
-80
-Elias Charalambous
-ECHIPA
-CFR Cluj
-Gruia
-Cluj
-4000000
-75
-Dan Petrescu
-ECHIPA
-Rapid
-Giulesti
-Bucuresti
-3000000
-72
-Costel Galca
-ECHIPA
-U Craiova
-Ion Oblemenco
-Craiova
-3500000
-74
-Mirel Radoi
-ECHIPA
-Dinamo
-Arcul de Triumf
-Bucuresti
-1500000
-65
-Zeljko Kopic
-ECHIPA
-Farul Constanta
-Academia Hagi
-Constanta
-2500000
-73
-Gheorghe Hagi
-ARBITRU
-Kovacs
-Istvan
-Carei
-ARBITRU
-Coltescu
-Sebastian
-Craiova
-ARBITRU
-Hategan
-Ovidiu
-Arad
-ARBITRU
-Feșnic
-Horațiu
-Cluj-Napoca
-JUCATOR_INFO
-Florinel
-Coman
-Romania
-75
-183
-Atacant Stanga
-Mijlocas Stanga
-JUCATOR_STATS
-88
-80
-75
-82
-45
-68
-JUCATOR_INFO
-Darius
-Olaru
-Romania
-72
-180
-Mijlocas Central
-Mijlocas Ofensiv
-JUCATOR_STATS
-80
-76
-79
-77
-65
-70
-ANTRENOR
-Gheorghe
-Hagi
-59
-Romania
-ANTRENOR
-Dan
-Petrescu
-57
-Romania
-STAFF
-Ion
-Popescu
-Fizioterapeut
-STAFF
-Vasile
-Marinescu
-Medic Sportiv
-END
+FORMAT:
+TIP Nume Prenume [Atribute Specifice]
+JUCATOR: Rating Pozitie Numar
+ANTRENOR: AniExperienta Trofee
+MEDIC: Specializare AniExperienta
+ARBITRU: Meciuri EcusonFIFA(1=Da/0=Nu)
+--- PORTARI ---
+JUCATOR Nita Florin 82 GK 1
+JUCATOR Moldovan Horatiu 78 GK 12
+JUCATOR Tarnovanu Stefan 75 GK 33
+--- FUNDASI ---
+JUCATOR Ratiu Andrei 80 RB 2
+JUCATOR Manea Cristian 76 RB 22
+JUCATOR Dragusin Radu 84 CB 3
+JUCATOR Burca Andrei 79 CB 4
+JUCATOR Rus Adrian 75 CB 5
+JUCATOR Racovitan Bogdan 74 CB 15
+JUCATOR Bancu Nicusor 79 LB 11
+JUCATOR Dumitrescu Andres 73 LB 24
+--- MIJLOCASI ---
+JUCATOR Marin Razvan 81 CDM 6
+JUCATOR Marius Marin 78 CDM 18
+JUCATOR Stanciu Nicolae 83 CAM 10
+JUCATOR Cicaldau Alexandru 77 CM 8
+JUCATOR Olaru Darius 79 CM 26
+JUCATOR Hagi Ianis 80 CAM 14
+JUCATOR Sut Adrian 75 CDM 16
+--- ATACANTI / EXTREME ---
+JUCATOR Man Dennis 82 RW 98
+JUCATOR Morutan Olimpiu 77 RW 21
+JUCATOR Mihaila Valentin 80 LW 20
+JUCATOR Coman Florinel 78 LW 7
+JUCATOR Dragus Denis 79 ST 9
+JUCATOR Puscas George 75 ST 25
+JUCATOR Alibec Denis 76 ST 19
+JUCATOR Birligea Daniel 74 ST 30
+--- STAFF TEHNIC ---
+ANTRENOR Iordanescu Edward 45 3
+ANTRENOR Pancu Daniel 40 1
+--- STAFF MEDICAL ---
+MEDIC Popescu Ion Ortopedie 15
+MEDIC Ionescu Maria Cardiologie 10
+MEDIC Georgescu Vlad Kinetoterapie 8
+--- OFICIALI ---
+ARBITRU Hategan Ovidiu 200 1
+ARBITRU Kovacs Istvan 180 1
+ARBITRU Coltescu Sebastian 150 0
