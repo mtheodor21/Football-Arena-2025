@@ -40,46 +40,43 @@ void Club::adaugaMembru(const Persoana& p) {
 
 void Club::afiseazaMembri() const {
     std::cout << "\n=== Membrii Clubului " << numeClub << " ===\n";
-    std::for_each(membri.begin(), membri.end(), [](const Persoana* p) {
+    for (const auto* p : membri) {
         std::cout << *p;
-    });
+    }
 }
 
+// --- FUNCTIA CARE LIPSEA ---
 void Club::salveazaInFisier() const {
     std::ofstream fout("informatii_club.txt");
 
     if (!fout.is_open()) {
-        std::cerr << "[EROARE] Nu s-a putut deschide fisierul 'informatii_club.txt' pentru scriere!\n";
+        std::cerr << "[EROARE] Nu s-a putut deschide fisierul pentru scriere!\n";
         return;
     }
 
-    fout << "=== RAPORT DETALIAT CLUB: " << numeClub << " ===\n\n";
-    fout << "Numar total membri: " << membri.size() << "\n";
-    fout << "--------------------------------\n";
+    fout << "=== RAPORT CLUB: " << numeClub << " ===\n";
+    fout << "Total Membri: " << membri.size() << "\n\n";
 
     for (const auto* p : membri) {
         fout << *p;
     }
 
     fout.close();
-    std::cout << "[INFO] Datele au fost salvate cu succes in fisierul 'informatii_club.txt'.\n";
+    std::cout << "[INFO] Datele au fost salvate in 'informatii_club.txt'.\n";
 }
+// ----------------------------
 
 void Club::analizeazaEchipa() const {
     std::cout << "\n--- Analiza Structura Echipa ---\n";
     for (const auto* p : membri) {
         if (const Jucator* j = dynamic_cast<const Jucator*>(p)) {
-            std::cout << "[Jucator gasit] " << j->getNumeComplet()
-                      << " joaca pe pozitia " << j->getPozitie() << "\n";
+            std::cout << "[Jucator] " << j->getNumeComplet() << " (" << j->getPozitie() << ")\n";
         }
         else if (const Antrenor* a = dynamic_cast<const Antrenor*>(p)) {
-            std::cout << "[STAFF TEHNIC] " << a->getNumeComplet() << " coordoneaza echipa.\n";
+            std::cout << "[Staff] " << a->getNumeComplet() << " (Antrenor)\n";
         }
         else if (dynamic_cast<const Arbitru*>(p)) {
-            std::cout << "[OFICIAL] Avem un arbitru in incinta.\n";
-        }
-        else {
-            std::cout << "[NECUNOSCUT] Persoana neidentificata.\n";
+            std::cout << "[Oficial] Arbitru delegat\n";
         }
     }
 }
