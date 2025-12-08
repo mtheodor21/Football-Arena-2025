@@ -789,6 +789,51 @@ void meniuStatistici() {
     if(c==1) istoricMeciuri.afiseazaIstoric();
 }
 
+void meniuScout() {
+    clear();
+    std::cout << "=== RAPORT SCOUTING OFICIAL ===\n";
+
+    int advIdx = (etapa % (liga.size()-1)) + 1;
+    EchipaAI& nextAdv = liga[advIdx];
+
+    std::cout << "Urmatorul Adversar: " << nextAdv.nume << "\n";
+    std::cout << "Rating General: " << nextAdv.rating << " | Pozitie in clasament: " << (advIdx + 1) << "\n\n";
+
+    std::cout << "Analiza Tactica Detaliata:\n";
+    std::cout << "------------------------------------------\n";
+
+    if (nextAdv.nume == "FCSB") {
+        std::cout << "Stil de joc: Ofensiv total. Puncte forte: Atac pozitional si benzi laterale foarte rapide.\n";
+        std::cout << "Jucator cheie: Capitanul echipei, care dicteaza ritmul la mijlocul terenului.\n";
+        std::cout << "Vulnerabilitate: Spatiile lasate in spatele fundasilor laterali cand acestia urca in atac.\n";
+        std::cout << "Recomandare: Contraatac rapid si mingi lungi pe varf.\n";
+    } else if (nextAdv.nume == "CFR Cluj") {
+        std::cout << "Stil de joc: Pragmatic, fizic, organizat. Puncte forte: Faze fixe si disciplina tactica.\n";
+        std::cout << "Jucator cheie: Atacantul de careu, foarte puternic in duelurile aeriene.\n";
+        std::cout << "Vulnerabilitate: Lipsa de creativitate in momentele de presiune sustinuta.\n";
+        std::cout << "Recomandare: Posesie prelungita pentru a-i scoate din dispozitiv.\n";
+    } else if (nextAdv.nume == "Univ. Craiova") {
+        std::cout << "Stil de joc: Tehnic, posesie, spectacol. Puncte forte: Suturi de la distanta si combinatii rapide.\n";
+        std::cout << "Jucator cheie: Decarul echipei, capabil sa dribleze in regim de viteza.\n";
+        std::cout << "Vulnerabilitate: Inconstanta mentala si greseli personale in aparare.\n";
+        std::cout << "Recomandare: Presing agresiv (Gegenpress) in treimea lor.\n";
+    } else if (nextAdv.nume == "Rapid") {
+        std::cout << "Stil de joc: Pasiune, intensitate, public. Puncte forte: Atmosfera de acasa si daruirea jucatorilor.\n";
+        std::cout << "Jucator cheie: Portarul, care face meciuri mari in derby-uri.\n";
+        std::cout << "Vulnerabilitate: Se pot pierde cu firea daca sunt condusi devreme.\n";
+        std::cout << "Recomandare: Calm, posesie si fructificarea ocaziilor statice.\n";
+    } else {
+        std::cout << "Stil de joc: Echilibrat, defensiv in deplasare. Puncte forte: Coeziunea grupului.\n";
+        std::cout << "Jucator cheie: Mijlocasul defensiv care recupereaza multe mingi.\n";
+        std::cout << "Vulnerabilitate: Lipsa de experienta in meciurile cu miza mare.\n";
+        std::cout << "Recomandare: Atac pe toate planurile din primul minut.\n";
+    }
+
+    std::cout << "\nNota Scoutului Sef: 'Va fi un meci greu, Mister, dar avem sanse daca respectam planul tactic.'\n";
+    std::cout << "\nApasa ENTER pentru a reveni...";
+    std::string dummy; std::getline(std::cin, dummy);
+}
+
 void startJocPersonalizat() {
     clear();
     std::cout << "=== CONFIGURARE MANAGER ===\n";
@@ -813,12 +858,12 @@ void startJocPersonalizat() {
                   << " [Rating: " << liga[i].rating << "] ";
 
         if (liga[i].nume == "Amicii Giurgiu") {
-            std::cout << "- [NOU 2015] Echipă de prieteni, atmosferă de familie. Obiectiv: Evitarea retrogradării.";
+            std::cout << "- Echipa de prieteni, atmosfera de familie. Obiectiv: Evitarea retrogradarii. Motto: 'Fotbal pe bune, berea dupa'.";
         }
-        else if (liga[i].rating > 84) std::cout << "- Favorita la titlu, buget mare.";
-        else if (liga[i].rating > 80) std::cout << "- Echipa de Play-off.";
-        else if (liga[i].rating > 75) std::cout << "- Echipa de mijlocul clasamentului.";
-        else std::cout << "- Obiectiv: evitarea retrogradarii.";
+        else if (liga[i].rating > 84) std::cout << "- Favorita la titlu, buget mare, presiune uriasa.";
+        else if (liga[i].rating > 80) std::cout << "- Echipa de Play-off, lupta pentru Europa.";
+        else if (liga[i].rating > 75) std::cout << "- Echipa de mijlocul clasamentului, stabila.";
+        else std::cout << "- Obiectiv: evitarea retrogradarii, buget redus.";
         std::cout << "\n";
     }
 
@@ -830,8 +875,11 @@ void startJocPersonalizat() {
 
         if (indexReal != 0) {
             std::cout << "\nAi semnat contractul cu " << liga[indexReal].nume << "!\n";
+            std::cout << "Presa anunta mutarea anului in Liga 1...\n";
+
             numeClub = liga[indexReal].nume;
             std::swap(liga[0], liga[indexReal]);
+
             moralEchipa = 75;
             incredereConducere = 80;
         } else {
@@ -920,7 +968,7 @@ int main() {
 
         ziar.afiseaza();
 
-        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. ACADEMIE\n6. CLASAMENT\n7. STAFF\n8. DETALII CLUB & ISTORIC\n9. SAVE & IESI\nCmd: ";
+        std::cout << "\n1. JOACA MECI\n2. TACTICA & ECHIPA\n3. TRANSFERURI\n4. FINANTE\n5. ACADEMIE\n6. CLASAMENT\n7. STAFF\n8. DETALII CLUB & ISTORIC\n9. SAVE & IESI\n10. RAPORT SCOUT ADVERSAR\nCmd: ";
         int cmd = 0;
         if (!citesteNumar(cmd)) {
             if (std::cin.eof()) break;
@@ -953,6 +1001,9 @@ int main() {
                 club.salveazaInFisier();
                 finante.detaseaza(&ziar);
                 running = false;
+                break;
+            case 10:
+                meniuScout();
                 break;
         }
     }
