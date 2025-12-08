@@ -200,7 +200,6 @@ public:
         }
     }
 
-
     void iaImprumut(long long suma) {
         if(datorieBanca > 15000000) {
             std::cout << "[BANCA] Refuzat. Grad de indatorare critic.\n";
@@ -293,7 +292,7 @@ int incredereConducere = INCREDERE_INITIALA;
 int numarFani = 15000;
 int capacitateStadion = 25000;
 std::string numeManager;
-std::string numeClub = "FC Politehnica";
+std::string numeClub = "Amicii Giurgiu";
 bool echipaModificataManual = false;
 
 std::vector<std::unique_ptr<Jucator>> lot;
@@ -471,7 +470,8 @@ void joacaMeciOficial() {
         std::cout << "[STADION] " << spectatori << " de fani canta imnul!\n";
     }
 
-    std::cout << "\nSTART MECI: " << noi->nume << " (" << putereNoi << ") vs " << adv.nume << " (" << putereAdv << ")\n";
+    std::cout << "\n=== MECIUL TAU (Etapa " << etapa << ") ===\n";
+    std::cout << noi->nume << " (" << putereNoi << ") vs " << adv.nume << " (" << putereAdv << ")\n";
     sleepMs(1500);
 
     int scorNoi=0, scorAdv=0;
@@ -492,12 +492,10 @@ void joacaMeciOficial() {
                 GameData::getMeta(acc).accidentat = true;
                 GameData::getMeta(acc).saptamaniIndisponibil = 3;
                 std::cout << "ACCIDENTARE! " << acc->getNumeComplet() << " cere schimbare.\n";
-
                 if(!medici.empty()) {
                    int skill = medici[0]->trateazaJucator();
                    std::cout << " (Medic skill " << skill << ": Jucatorul va fi tratat rapid)\n";
                 }
-
                 putereNoi -= 10;
                 sleepMs(1000);
                 continue;
@@ -510,10 +508,8 @@ void joacaMeciOficial() {
                     if(!titulari.empty()) GameData::getMeta(titulari[rand()%titulari.size()]).stats.goluri++;
                 } else if (rand()%100 < 20) std::cout << genereazaComentariu(noi->nume, 1) << "\n";
                 else if (rand()%100 < 5) {
-                    std::cout << "Verificare VAR...\n";
-                    sleepMs(1000);
-                    std::cout << genereazaComentariu(noi->nume, 3) << "\n";
-                    scorNoi++;
+                    std::cout << "Verificare VAR... "; sleepMs(800);
+                    std::cout << genereazaComentariu(noi->nume, 3) << "\n"; scorNoi++;
                 }
                 else std::cout << genereazaComentariu(noi->nume, 2) << "\n";
             } else {
@@ -524,18 +520,16 @@ void joacaMeciOficial() {
             }
             sleepMs(800);
         } else if (minute % 15 == 0) {
-             std::cout << "Min " << std::setw(2) << minute << ": ";
-             if(tacticaCurenta.stil == StilJoc::POSESIE) std::cout << "Dominam posesia si construim calm.\n";
-             else std::cout << "Joc fizic la mijlocul terenului.\n";
+             std::cout << "Min " << std::setw(2) << minute << ": Joc echilibrat la mijlocul terenului...\n";
              sleepMs(200);
         }
     }
 
-    std::cout << "\nFINAL: " << scorNoi << " - " << scorAdv << "\n";
+    std::cout << "\nFINAL MECI: " << scorNoi << " - " << scorAdv << "\n";
 
     istoricMeciuri.adaugaEveniment("Etapa " + std::to_string(etapa) + ": " + std::to_string(scorNoi) + "-" + std::to_string(scorAdv));
-
     noi->mj++; adv.mj++; noi->gm+=scorNoi; noi->gp+=scorAdv; adv.gm+=scorAdv; adv.gp+=scorNoi;
+
     for(auto* j : titulari) {
         auto& m = GameData::getMeta(j);
         m.conditieFizica = std::max(0, m.conditieFizica - 15);
@@ -566,18 +560,50 @@ void joacaMeciOficial() {
         finante.actualizeazaPopularitate(-3);
     }
 
+    std::cout << "\n-------------------------------------------------\n";
+    std::cout << "Se simuleaza celelalte partide din Etapa " << etapa << "...\n";
+    sleepMs(1000);
+
+    std::vector<int> alteEchipe;
     for(size_t i=1; i<liga.size(); ++i) {
         if((int)i != advIdx) {
-            int gA = rand()%4, gB = rand()%4;
-            liga[i].mj++; liga[i].gm+=gA; liga[i].gp+=gB;
-            if(gA>gB) { liga[i].puncte+=3; liga[i].v++; }
-            else if(gA==gB) { liga[i].puncte++; liga[i].e++; }
-            else liga[i].i++;
+            alteEchipe.push_back((int)i);
         }
     }
 
+    std::shuffle(alteEchipe.begin(), alteEchipe.end(), std::default_random_engine(std::time(0)));
+
+    for(size_t i = 0; i < alteEchipe.size(); i += 2) {
+        if(i + 1 >= alteEchipe.size()) break;
+
+        int idx1 = alteEchipe[i];
+        int idx2 = alteEchipe[i+1];
+        EchipaAI& e1 = liga[idx1];
+        EchipaAI& e2 = liga[idx2];
+
+        int p1 = e1.rating + (rand() % 10 - 5);
+        int p2 = e2.rating + (rand() % 10 - 5);
+
+        int g1 = 0, g2 = 0;
+        if (p1 > p2) { g1 = rand() % 3 + 1; g2 = rand() % 2; }
+        else if (p2 > p1) { g1 = rand() % 2; g2 = rand() % 3 + 1; }
+        else { g1 = rand() % 3; g2 = g1; }
+
+        std::cout << std::left << std::setw(20) << e1.nume << " vs " << std::setw(20) << e2.nume << ": " << g1 << " - " << g2 << "\n";
+
+        e1.mj++; e1.gm += g1; e1.gp += g2;
+        e2.mj++; e2.gm += g2; e2.gp += g1;
+
+        if (g1 > g2) { e1.v++; e1.puncte += 3; e2.i++; }
+        else if (g2 > g1) { e2.v++; e2.puncte += 3; e1.i++; }
+        else { e1.e++; e1.puncte++; e2.e++; e2.puncte++; }
+
+        sleepMs(150);
+    }
+    std::cout << "-------------------------------------------------\n";
+
     etapa++;
-    std::cout << "\nApasa ENTER pentru a reveni la meniu...";
+    std::cout << "\nEtapa s-a incheiat. Apasa ENTER pentru a reveni la meniu...";
     std::string dummy; std::getline(std::cin, dummy);
 }
 
@@ -763,17 +789,72 @@ void meniuStatistici() {
     if(c==1) istoricMeciuri.afiseazaIstoric();
 }
 
+void startJocPersonalizat() {
+    clear();
+    std::cout << "=== CONFIGURARE MANAGER ===\n";
+
+    std::cout << "Introdu numele tau de Manager: ";
+    std::string numeInput;
+    if (std::cin.peek() == '\n') std::cin.ignore();
+    std::getline(std::cin, numeInput);
+
+    if (!numeInput.empty()) {
+        numeManager = numeInput;
+    }
+
+    clear();
+    std::cout << "=== ALEGE ECHIPA DE CLUB ===\n";
+    std::cout << "Analiza scouterilor pentru echipele disponibile:\n\n";
+
+    liga[0].rating = calculeazaPutereReala();
+
+    for(size_t i = 0; i < liga.size(); ++i) {
+        std::cout << std::setw(2) << i + 1 << ". " << std::left << std::setw(20) << liga[i].nume
+                  << " [Rating: " << liga[i].rating << "] ";
+
+        if (liga[i].nume == "Amicii Giurgiu") {
+            std::cout << "- [NOU 2015] Echipă de prieteni, atmosferă de familie. Obiectiv: Evitarea retrogradării.";
+        }
+        else if (liga[i].rating > 84) std::cout << "- Favorita la titlu, buget mare.";
+        else if (liga[i].rating > 80) std::cout << "- Echipa de Play-off.";
+        else if (liga[i].rating > 75) std::cout << "- Echipa de mijlocul clasamentului.";
+        else std::cout << "- Obiectiv: evitarea retrogradarii.";
+        std::cout << "\n";
+    }
+
+    std::cout << "\nIntrodu numarul echipei pe care vrei sa o antrenezi (1-" << liga.size() << "): ";
+    int optiune = 0;
+
+    if (citesteNumar(optiune) && optiune >= 1 && optiune <= (int)liga.size()) {
+        int indexReal = optiune - 1;
+
+        if (indexReal != 0) {
+            std::cout << "\nAi semnat contractul cu " << liga[indexReal].nume << "!\n";
+            numeClub = liga[indexReal].nume;
+            std::swap(liga[0], liga[indexReal]);
+            moralEchipa = 75;
+            incredereConducere = 80;
+        } else {
+            std::cout << "\nAi ales sa ramai la echipa de suflet (" << numeClub << ").\n";
+        }
+    } else {
+        std::cout << "Selectie invalida. Vei antrena echipa implicita: " << numeClub << ".\n";
+    }
+
+    sleepMs(2000);
+}
+
 int main() {
     srand(time(0));
 
-    numeClub = "Club Necunoscut";
+    numeClub = "Amicii Giurgiu";
 
     finante.ataseaza(&ziar);
 
     std::ifstream fin("tastatura.txt");
     if (!fin.is_open()) {
         std::ofstream fout("tastatura.txt");
-        fout << "CLUB FC_Politehnica\n";
+        fout << "CLUB Amicii_Giurgiu\n";
         fout << "MANAGER Hagi Gheorghe\n";
         fout << "JUCATOR Nita Florin 82 GK 1\nJUCATOR Ratiu Andrei 80 RB 2\nJUCATOR Dragusin Radu 84 CB 3\n"
              << "JUCATOR Burca Andrei 78 CB 4\nJUCATOR Bancu Nicusor 79 LB 11\nJUCATOR Marin Razvan 81 CM 6\n"
@@ -820,6 +901,10 @@ int main() {
     autoSelecteazaPrimul11();
     initLiga();
     finante.adaugaSponsor(30000);
+
+    if (!std::cin.eof()) {
+        startJocPersonalizat();
+    }
 
     std::cin.clear();
 
