@@ -1,3 +1,4 @@
+
 #include "jucator.h"
 
 Jucator::Jucator(const std::string& n, const std::string& p, int r, const std::string& poz, int nr)
@@ -26,11 +27,9 @@ void Jucator::afisareDetaliata(std::ostream& os) const {
 int Portar::calculeazaEficienta() const { return rating * 1.1; }
 Persoana* Portar::clone() const { return new Portar(*this); }
 
-int Fundas::calculeazaEficienta() const { return rating; }
+
 Persoana* Fundas::clone() const { return new Fundas(*this); }
 
-int Mijlocas::calculeazaEficienta() const { return rating; }
 Persoana* Mijlocas::clone() const { return new Mijlocas(*this); }
 
-int Atacant::calculeazaEficienta() const { return rating; }
 Persoana* Atacant::clone() const { return new Atacant(*this); }

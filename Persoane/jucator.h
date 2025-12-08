@@ -15,7 +15,7 @@ public:
 
     ~Jucator() override = default;
 
-    int calculeazaEficienta() const override;
+    virtual int calculeazaEficienta() const override;
     Persoana* clone() const override;
 
     const std::string& getPozitie() const;
@@ -29,6 +29,7 @@ protected:
 class Portar : public Jucator {
 public:
     using Jucator::Jucator;
+
     int calculeazaEficienta() const override;
     Persoana* clone() const override;
 };
@@ -36,21 +37,20 @@ public:
 class Fundas : public Jucator {
 public:
     using Jucator::Jucator;
-    int calculeazaEficienta() const override;
+
     Persoana* clone() const override;
 };
 
 class Mijlocas : public Jucator {
 public:
     using Jucator::Jucator;
-    int calculeazaEficienta() const override;
+
     Persoana* clone() const override;
 };
 
 class Atacant : public Jucator {
 public:
     using Jucator::Jucator;
-    int calculeazaEficienta() const override;
     Persoana* clone() const override;
 };
 
