@@ -838,6 +838,5 @@ int main() {
 
     for(auto* j : academia) delete j;
     academia.clear();
-
     return 0;
 }
