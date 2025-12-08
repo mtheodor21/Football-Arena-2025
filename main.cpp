@@ -206,7 +206,7 @@ public:
     long long getBalans() const { return balans; }
     long long getDatorie() const { return datorieBanca; }
     void adaugaSponsor(long long suma) { venitSponsori += suma; }
-    void incaseazaSponsori() { if(venitSponsori > 0) tranzactie(venitSponsori, "Sponsori & Marketing"); }
+
 
     void actualizeazaPopularitate(int delta) {
         popularitateClub = std::max(10, std::min(100, popularitateClub + delta));

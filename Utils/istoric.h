@@ -22,7 +22,7 @@ public:
         evenimente.push_back(eveniment);
     }
 
-    T getUltimulEveniment() const {
+  /*  T getUltimulEveniment() const {
         if (evenimente.empty()) {
             return T();
         }
@@ -37,7 +37,7 @@ public:
         return evenimente;
     }
 
-
+    */
     void afiseazaIstoric() const {
         if (evenimente.empty()) {
             std::cout << "Nu exista evenimente in istoric." << std::endl;
