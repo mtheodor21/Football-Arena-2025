@@ -21,20 +21,6 @@ public:
         evenimente.push_back(eveniment);
     }
 
-    T getUltimulEveniment() const {
-        if (evenimente.empty()) {
-            return T();
-        }
-        return evenimente.back();
-    }
-
-    size_t getNumarEvenimente() const {
-        return evenimente.size();
-    }
-
-    const std::vector<T>& getEvenimente() const {
-        return evenimente;
-    }
 
     void afiseazaIstoric() const {
         if (evenimente.empty()) {
