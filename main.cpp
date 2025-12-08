@@ -794,7 +794,7 @@ void meniuScout() {
     std::cout << "=== RAPORT SCOUTING OFICIAL ===\n";
 
     int advIdx = (etapa % (liga.size()-1)) + 1;
-    EchipaAI& nextAdv = liga[advIdx];
+    const EchipaAI& nextAdv = liga[advIdx];
 
     std::cout << "Urmatorul Adversar: " << nextAdv.nume << "\n";
     std::cout << "Rating General: " << nextAdv.rating << " | Pozitie in clasament: " << (advIdx + 1) << "\n\n";
@@ -858,7 +858,7 @@ void startJocPersonalizat() {
                   << " [Rating: " << liga[i].rating << "] ";
 
         if (liga[i].nume == "Amicii Giurgiu") {
-            std::cout << "- Echipa de prieteni, atmosfera de familie. Obiectiv: Evitarea retrogradarii. Motto: 'Fotbal pe bune, berea dupa'.";
+            std::cout << "- [NOU 2015] Echipă de prieteni, atmosferă de familie. Obiectiv: Evitarea retrogradării. Motto: 'Fotbal pe bune, berea după'.";
         }
         else if (liga[i].rating > 84) std::cout << "- Favorita la titlu, buget mare, presiune uriasa.";
         else if (liga[i].rating > 80) std::cout << "- Echipa de Play-off, lupta pentru Europa.";
