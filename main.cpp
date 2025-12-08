@@ -858,7 +858,7 @@ void startJocPersonalizat() {
                   << " [Rating: " << liga[i].rating << "] ";
 
         if (liga[i].nume == "Amicii Giurgiu") {
-            std::cout << "- [NOU 2015] Echipă de prieteni, atmosferă de familie. Obiectiv: Evitarea retrogradării. Motto: 'Fotbal pe bune, berea după'.";
+            std::cout << "- Echipa de prieteni, atmosfera de familie. Obiectiv: Evitarea retrogradarii. Motto: 'Fotbal pe bune, berea dupa'.";
         }
         else if (liga[i].rating > 84) std::cout << "- Favorita la titlu, buget mare, presiune uriasa.";
         else if (liga[i].rating > 80) std::cout << "- Echipa de Play-off, lupta pentru Europa.";
