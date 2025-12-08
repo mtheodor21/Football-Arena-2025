@@ -178,6 +178,13 @@ public:
         }
     }
 
+    void platesteSalarii(const std::vector<std::unique_ptr<Jucator>>& echipa) {
+        long long total = 0;
+        for(const auto& j_ptr : echipa) {
+            total += GameData::getMeta(j_ptr.get()).salariuSaptamanal;
+        }
+        tranzactie(-total, "Salarii Jucatori & Staff");
+    }
 
     void iaImprumut(long long suma) {
         if(datorieBanca > 15000000) {
@@ -287,7 +294,9 @@ void clear() {
 #ifdef _WIN32
     system("cls");
 #else
-    system("clear");
+    if (std::getenv("TERM")) {
+        system("clear");
+    }
 #endif
     for(int i=0; i<30; ++i) std::cout << "\n";
 }
