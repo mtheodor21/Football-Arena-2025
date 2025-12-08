@@ -284,13 +284,7 @@ std::vector<Jucator*> rezerve;
 std::vector<EchipaAI> liga;
 
 void clear() {
-#ifdef _WIN32
-    system("cls");
-#else
-    if (std::getenv("TERM")) {
-        system("clear");
-    }
-#endif
+    // Implementare sigura care nu depinde de variabile de mediu
     for(int i=0; i<30; ++i) std::cout << "\n";
 }
 void sleepMs(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
@@ -789,7 +783,7 @@ int main() {
     bool running = true;
     while(running) {
         clear();
-        std::cout << "=== MANAGER PRO 2025 ===\n";
+        std::cout << "=== FOOTBALL ARENA 2025 ===\n";
         std::cout << "Club: " << numeClub << " | Manager: " << numeManager << "\n";
         finante.afiseazaRaportDetaliat();
         std::cout << "Echipa: " << (echipaModificataManual ? "MANUAL" : "AUTO") << " | Rating: " << calculeazaPutereReala() << "\n";
