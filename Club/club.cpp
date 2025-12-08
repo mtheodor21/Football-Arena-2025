@@ -41,7 +41,6 @@ void Club::adaugaMembru(const Persoana& p) {
 
 
 
-// --- FUNCTIA CARE LIPSEA ---
 void Club::salveazaInFisier() const {
     std::ofstream fout("informatii_club.txt");
 
@@ -60,7 +59,7 @@ void Club::salveazaInFisier() const {
     fout.close();
     std::cout << "[INFO] Datele au fost salvate in 'informatii_club.txt'.\n";
 }
-// ----------------------------
+
 
 void Club::analizeazaEchipa() const {
     std::cout << "\n--- Analiza Structura Echipa ---\n";

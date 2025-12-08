@@ -178,9 +178,11 @@ public:
         }
     }
 
-    void platesteSalarii(const std::vector<Jucator*>& lot) {
+    void platesteSalarii(const std::vector<std::unique_ptr<Jucator>>& echipa) {
         long long total = 0;
-        for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
+        for(const auto& j_ptr : echipa) {
+            total += GameData::getMeta(j_ptr.get()).salariuSaptamanal;
+        }
         tranzactie(-total, "Salarii Jucatori & Staff");
     }
 
@@ -279,13 +281,14 @@ std::string numeManager;
 std::string numeClub = "FC Politehnica";
 bool echipaModificataManual = false;
 
-std::vector<Jucator*> lot;
+std::vector<std::unique_ptr<Jucator>> lot;
+std::vector<std::unique_ptr<Jucator>> academia;
+std::vector<std::unique_ptr<Medic>> medici;
+std::vector<std::unique_ptr<Antrenor>> antrenori;
+
 std::vector<Jucator*> titulari;
 std::vector<Jucator*> rezerve;
-std::vector<Jucator*> academia;
 std::vector<EchipaAI> liga;
-std::vector<Medic*> medici;
-std::vector<Antrenor*> antrenori;
 
 void clear() {
 #ifdef _WIN32
@@ -310,14 +313,15 @@ void sincronizeazaLot() {
     titulari.clear();
     rezerve.clear();
     for(size_t i=0; i<lot.size(); ++i) {
-        if(i < 11) titulari.push_back(lot[i]);
-        else rezerve.push_back(lot[i]);
+        if(i < 11) titulari.push_back(lot[i].get());
+        else rezerve.push_back(lot[i].get());
     }
 }
 
 void sincronizeazaRezerve() {
     rezerve.clear();
-    for(auto* j : lot) {
+    for(auto& j_ptr : lot) {
+        Jucator* j = j_ptr.get();
         bool eTitular = false;
         for(const auto* t : titulari) {
             if(t == j) { eTitular = true; break; }
@@ -382,55 +386,55 @@ void autoSelecteazaPrimul11() {
     titulari.clear();
     std::vector<int> cerinte = tacticaCurenta.getCerinte();
 
-    std::sort(lot.begin(), lot.end(), [](const Jucator* a, const Jucator* b){
+    std::sort(lot.begin(), lot.end(), [](const std::unique_ptr<Jucator>& a, const std::unique_ptr<Jucator>& b){
         return a->getRating() > b->getRating();
     });
 
-    for(auto* j : lot) {
-        if(j->getPozitie() == "GK" && !GameData::getMeta(j).accidentat) {
-            titulari.push_back(j);
+    for(auto& j : lot) {
+        if(j->getPozitie() == "GK" && !GameData::getMeta(j.get()).accidentat) {
+            titulari.push_back(j.get());
             break;
         }
     }
 
     int nevoieDef = cerinte[0];
-    for(auto* j : lot) {
+    for(auto& j : lot) {
         if(nevoieDef == 0) break;
         std::string p = j->getPozitie();
-        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j) != titulari.end());
-        if(!dejaSelectat && !GameData::getMeta(j).accidentat && (p=="CB" || p=="RB" || p=="LB")) {
-            titulari.push_back(j);
+        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j.get()) != titulari.end());
+        if(!dejaSelectat && !GameData::getMeta(j.get()).accidentat && (p=="CB" || p=="RB" || p=="LB")) {
+            titulari.push_back(j.get());
             nevoieDef--;
         }
     }
 
     int nevoieMid = cerinte[1];
-    for(auto* j : lot) {
+    for(auto& j : lot) {
         if(nevoieMid == 0) break;
         std::string p = j->getPozitie();
-        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j) != titulari.end());
-        if(!dejaSelectat && !GameData::getMeta(j).accidentat && (p.find("M") != std::string::npos)) {
-            titulari.push_back(j);
+        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j.get()) != titulari.end());
+        if(!dejaSelectat && !GameData::getMeta(j.get()).accidentat && (p.find("M") != std::string::npos)) {
+            titulari.push_back(j.get());
             nevoieMid--;
         }
     }
 
     int nevoieAtt = cerinte[2];
-    for(auto* j : lot) {
+    for(auto& j : lot) {
         if(nevoieAtt == 0) break;
         std::string p = j->getPozitie();
-        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j) != titulari.end());
-        if(!dejaSelectat && !GameData::getMeta(j).accidentat && (p=="ST" || p=="LW" || p=="RW")) {
-            titulari.push_back(j);
+        bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j.get()) != titulari.end());
+        if(!dejaSelectat && !GameData::getMeta(j.get()).accidentat && (p=="ST" || p=="LW" || p=="RW")) {
+            titulari.push_back(j.get());
             nevoieAtt--;
         }
     }
 
     while(titulari.size() < 11) {
-        for(auto* j : lot) {
-            bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j) != titulari.end());
-            if(!dejaSelectat && !GameData::getMeta(j).accidentat) {
-                titulari.push_back(j);
+        for(auto& j : lot) {
+            bool dejaSelectat = (std::find(titulari.begin(), titulari.end(), j.get()) != titulari.end());
+            if(!dejaSelectat && !GameData::getMeta(j.get()).accidentat) {
+                titulari.push_back(j.get());
                 if(titulari.size() == 11) break;
             }
         }
@@ -633,7 +637,7 @@ void meniuTransferuri() {
                 if(salOpt == 1) {
                     finante.tranzactie(-oferta, "Transfer");
                     Jucator* j = JucatorFactory::getInstance().creazaJucator(names[opt-1], "Nou", rtg, "ST", 99);
-                    lot.push_back(j);
+                    lot.push_back(std::unique_ptr<Jucator>(j));
                     GameData::getMeta(j).salariuSaptamanal = salariuCerut;
                     sincronizeazaLot();
                     std::cout << "Transfer Reusit!\n";
@@ -653,7 +657,7 @@ void meniuAcademie() {
     std::cout << "Jucatori in Academie: " << academia.size() << "\n";
     if(!academia.empty()) {
         for(size_t i=0; i<academia.size(); ++i) {
-            const auto& m = GameData::getMeta(academia[i]);
+            const auto& m = GameData::getMeta(academia[i].get());
             std::cout << i+1 << ". " << academia[i]->getNumeComplet()
                       << " (" << academia[i]->getPozitie() << ") Rtg:" << academia[i]->getRating()
                       << " Pot:" << m.potential << "\n";
@@ -663,7 +667,7 @@ void meniuAcademie() {
         if(c==1 && !academia.empty()) {
             std::cout << "ID: "; int id; std::cin >> id;
             if(id>0 && id<=(int)academia.size()) {
-                lot.push_back(academia[id-1]);
+                lot.push_back(std::move(academia[id-1]));
                 academia.erase(academia.begin() + id - 1);
                 sincronizeazaLot();
                 std::cout << "Promovat!\n";
@@ -676,7 +680,7 @@ void meniuAcademie() {
             finante.tranzactie(-10000, "Trial Juniori");
             Jucator* j = new Jucator("Junior", "Talent", 55+rand()%10, "CAM", 0);
             GameData::getMeta(j).potential = 80 + rand()%20;
-            academia.push_back(j);
+            academia.push_back(std::unique_ptr<Jucator>(j));
             std::cout << "Am gasit un talent!\n";
         }
     }
@@ -703,8 +707,8 @@ void meniuStaff() {
     std::cout << "Medici: " << medici.size() << "\n";
     std::cout << "\n1. Listeaza Antrenori\n2. Listeaza Medici\n0. Back\n";
     int c; std::cin >> c;
-    if(c==1) for(const auto* a: antrenori) std::cout << a->getNumeComplet() << "\n";
-    if(c==2) for(const auto* m: medici) std::cout << m->getNumeComplet() << "\n";
+    if(c==1) for(const auto& a: antrenori) std::cout << a->getNumeComplet() << "\n";
+    if(c==2) for(const auto& m: medici) std::cout << m->getNumeComplet() << "\n";
     sleepMs(2000);
 }
 
@@ -715,7 +719,7 @@ void meniuDetaliiClub(const Club& club) {
     std::cout << "Total membri: " << club.getNumarJucatori() << "\n";
 
     if (!lot.empty()) {
-        std::cout << "Exemplu Meta Data Capitan: " << GameData::getMeta(lot[0]).toString() << "\n";
+        std::cout << "Exemplu Meta Data Capitan: " << GameData::getMeta(lot[0].get()).toString() << "\n";
     }
 
     std::cout << "\nApasa ENTER..."; std::cin.ignore(); std::cin.get();
@@ -769,14 +773,14 @@ int main() {
             std::string n, p; fin >> n >> p;
             int r, nr; std::string poz; fin >> r >> poz >> nr;
             Jucator* j = JucatorFactory::getInstance().creazaJucator(n, p, r, poz, nr);
-            lot.push_back(j);
+            lot.push_back(std::unique_ptr<Jucator>(j));
             club.adaugaMembru(*j);
         } else if(tip == "MEDIC") {
             std::string n, p; fin >> n >> p;
-            std::string s; int e; fin >> s >> e; medici.push_back(new Medic(n, p, s, e));
+            std::string s; int e; fin >> s >> e; medici.push_back(std::make_unique<Medic>(n, p, s, e));
         } else if(tip == "ANTRENOR") {
             std::string n, p; fin >> n >> p;
-            int a, t; fin >> a >> t; antrenori.push_back(new Antrenor(n, p, a, t));
+            int a, t; fin >> a >> t; antrenori.push_back(std::make_unique<Antrenor>(n, p, a, t));
         } else {
             std::string d; std::getline(fin, d);
         }
@@ -826,18 +830,6 @@ int main() {
                 break;
         }
     }
-
-    for(auto* j : lot) delete j;
-    lot.clear();
-
-    for(auto* m : medici) delete m;
-    medici.clear();
-
-    for(auto* a : antrenori) delete a;
-    antrenori.clear();
-
-    for(auto* j : academia) delete j;
-    academia.clear();
 
     return 0;
 }
