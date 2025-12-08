@@ -1,45 +1,27 @@
-#ifndef PERSOANA_H
-#define PERSOANA_H
+#ifndef PERSOANE_H
+#define PERSOANE_H
 
-#include <iostream>
 #include <string>
-#include <memory>
+#include <iostream>
 
 class Persoana {
 protected:
     std::string nume;
     std::string prenume;
-    static int contorPersoane;
 
 public:
-
-    Persoana(const std::string& nume, const std::string& prenume);
-
-    Persoana(const Persoana& other);
-
-
+    Persoana(const std::string& n, const std::string& p);
     virtual ~Persoana();
-
-
-    virtual Persoana* clone() const = 0;
-
-
-    virtual int calculeazaEficienta() const = 0;
-
-
-    void afiseazaInformatii(std::ostream& os) const;
 
     std::string getNumeComplet() const;
 
+    virtual int calculeazaEficienta() const = 0;
+    virtual Persoana* clone() const = 0;
 
-    static int getNumarPersoane();
+    friend std::ostream& operator<<(std::ostream& os, const Persoana& p);
 
 protected:
-
-    virtual void afisareDetaliata(std::ostream& os) const;
+    virtual void afisareDetaliata(std::ostream& os) const = 0;
 };
-
-
-std::ostream& operator<<(std::ostream& os, const Persoana& p);
 
 #endif

@@ -15,7 +15,7 @@ Jucator::Jucator(const Jucator& other)
 
 Jucator* Jucator::clone() const { return new Jucator(*this); }
 int Jucator::calculeazaEficienta() const { return ratingGeneral; }
-std::string Jucator::getPozitie() const { return pozitie; }
+const std::string Jucator::getPozitie() const { return pozitie; }
 void Jucator::afisareDetaliata(std::ostream& os) const {
     os << "Rol: JUCATOR GENERIC | Poz: " << pozitie << " | Nr: " << numarTricou << " | Rating: " << ratingGeneral << "\n";
 }

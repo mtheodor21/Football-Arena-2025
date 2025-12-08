@@ -40,7 +40,9 @@ private:
 public:
     virtual ~ISubject() = default;
     void ataseaza(IObserver* obs) { observatori.push_back(obs); }
-    void detaseaza(IObserver* obs) { observatori.remove(obs); }
+    void detaseaza(const IObserver* obs) {
+        observatori.remove(const_cast<IObserver*>(obs));
+    }
     void notifica(const std::string& mesaj) {
         for(auto* obs : observatori) obs->onNotificare(mesaj);
     }
@@ -176,7 +178,11 @@ public:
         }
     }
 
-    void platesteSalarii(const std::vector<Jucator*>& lot);
+    void platesteSalarii(const std::vector<Jucator*>& lot) {
+        long long total = 0;
+        for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
+        tranzactie(-total, "Salarii Jucatori & Staff");
+    }
 
     void iaImprumut(long long suma) {
         if(datorieBanca > 15000000) {
@@ -221,12 +227,6 @@ public:
         std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$\n";
     }
 };
-
-void Finante::platesteSalarii(const std::vector<Jucator*>& lot) {
-    long long total = 0;
-    for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
-    tranzactie(-total, "Salarii Jucatori & Staff");
-}
 
 class JucatorFactory {
 private:
@@ -653,7 +653,7 @@ void meniuAcademie() {
     std::cout << "Jucatori in Academie: " << academia.size() << "\n";
     if(!academia.empty()) {
         for(size_t i=0; i<academia.size(); ++i) {
-            auto& m = GameData::getMeta(academia[i]);
+            const auto& m = GameData::getMeta(academia[i]);
             std::cout << i+1 << ". " << academia[i]->getNumeComplet()
                       << " (" << academia[i]->getPozitie() << ") Rtg:" << academia[i]->getRating()
                       << " Pot:" << m.potential << "\n";
@@ -838,5 +838,6 @@ int main() {
 
     for(auto* j : academia) delete j;
     academia.clear();
+
     return 0;
 }

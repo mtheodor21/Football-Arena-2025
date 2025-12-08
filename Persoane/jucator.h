@@ -14,12 +14,12 @@ protected:
 public:
     Jucator(const std::string& nume, const std::string& prenume, int rating, std::string pozitie, int nr);
     Jucator(const Jucator& other);
-    virtual ~Jucator() = default;
+    ~Jucator() override= default;
 
     Jucator* clone() const override;
     int calculeazaEficienta() const override;
 
-    std::string getPozitie() const;
+    const std::string getPozitie() const;
     int getRating() const { return ratingGeneral; }
 
 
