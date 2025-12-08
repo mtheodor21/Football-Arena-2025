@@ -189,7 +189,7 @@ public:
         ziar.adaugaStire("Clubul s-a imprumutat cu " + std::to_string(suma) + " EUR");
     }
 
-    void platesteRata() {
+   /* void platesteRata() {
         if(datorieBanca > 0) {
             tranzactie(-rataSaptamanala, "Rata Banca");
             datorieBanca -= (rataSaptamanala * 0.85);
@@ -200,7 +200,7 @@ public:
             }
         }
     }
-
+*/
     void seteazaPretBilet(int pret) { pretBilet = pret; }
     int getPretBilet() const { return pretBilet; }
     long long getBalans() const { return balans; }
@@ -233,12 +233,12 @@ public:
     }
 };
 
-void Finante::platesteSalarii(const std::vector<Jucator*>& lot) {
+/*void Finante::platesteSalarii(const std::vector<Jucator*>& lot) {
     long long total = 0;
     for(auto* j : lot) total += GameData::getMeta(j).salariuSaptamanal;
     tranzactie(-total, "Salarii Jucatori & Staff");
 }
-
+*/
 class JucatorFactory {
 private:
     JucatorFactory() {}

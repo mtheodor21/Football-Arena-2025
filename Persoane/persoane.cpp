@@ -41,9 +41,7 @@ void Persoana::afisareDetaliata(std::ostream&) const {
     // Implementare default (poate fi goala)
 }
 
-int Persoana::getNumarPersoane() {
-    return contorPersoane;
-}
+
 
 std::ostream& operator<<(std::ostream& os, const Persoana& p) {
     p.afiseazaInformatii(os);

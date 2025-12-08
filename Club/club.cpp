@@ -38,12 +38,8 @@ void Club::adaugaMembru(const Persoana& p) {
     membri.push_back(p.clone());
 }
 
-void Club::afiseazaMembri() const {
-    std::cout << "\n=== Membrii Clubului " << numeClub << " ===\n";
-    for (const auto* p : membri) {
-        std::cout << *p;
-    }
-}
+
+
 
 // --- FUNCTIA CARE LIPSEA ---
 void Club::salveazaInFisier() const {

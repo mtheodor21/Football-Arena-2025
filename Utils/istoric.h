@@ -2,17 +2,18 @@
 #define ISTORIC_H
 
 #include <vector>
-#include <iostream>
-#include <algorithm>
+#include <stdexcept>
+#include <iostream> // Necesara pentru std::cout in afiseazaIstoric
 
 template <typename T>
 class Istoric {
 private:
     std::vector<T> evenimente;
-    int capacitateMaxima;
+    size_t capacitateMaxima;
 
 public:
-    explicit Istoric(int capacitate = 100) : capacitateMaxima(capacitate) {}
+
+    Istoric(size_t capacitate = 20) : capacitateMaxima(capacitate) {}
 
     void adaugaEveniment(const T& eveniment) {
         if (evenimente.size() >= capacitateMaxima) {
@@ -21,20 +22,31 @@ public:
         evenimente.push_back(eveniment);
     }
 
-    void afiseazaIstoric() const {
-        std::cout << "--- ISTORIC ---\n";
-        for (const auto& ev : evenimente) {
-            std::cout << ev << "\n";
-        }
-    }
-
     T getUltimulEveniment() const {
-        if (evenimente.empty()) throw std::runtime_error("Istoric gol!");
+        if (evenimente.empty()) {
+            return T();
+        }
         return evenimente.back();
     }
 
-    int getNumarEvenimente() const {
+    size_t getNumarEvenimente() const {
         return evenimente.size();
+    }
+
+    const std::vector<T>& getEvenimente() const {
+        return evenimente;
+    }
+
+
+    void afiseazaIstoric() const {
+        if (evenimente.empty()) {
+            std::cout << "Nu exista evenimente in istoric." << std::endl;
+            return;
+        }
+
+        for (const auto& ev : evenimente) {
+            std::cout << ev << std::endl;
+        }
     }
 };
 
