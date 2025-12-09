@@ -365,21 +365,21 @@ int calculeazaPutereReala() {
 }
 
 std::string genereazaComentariu(const std::string& echipaAtac, int tip) {
-    static const std::vector<std::string> goluri = {
+     const std::vector<std::string> goluri = {
         "GOOOOL " + echipaAtac + "! Sut fabulos direct in vinclu!",
         "GOOOOL! " + echipaAtac + " deschide apararea adversa ca pe o conserva!",
         "Incredibil! " + echipaAtac + " inscrie dupa o greseala uriasa!",
         "GOOOOL " + echipaAtac + "! Lovitura de cap perfecta din corner!"
     };
-    static const std::vector<std::string> bare = {
+    const std::vector<std::string> bare = {
         "BARA! " + echipaAtac + " a fost la un pas de gol!",
         "Sut violent al celor de la " + echipaAtac + " care loveste transversala!"
     };
-    static const std::vector<std::string> aparari = {
+    const std::vector<std::string> aparari = {
         "Portarul respinge eroic sutul celor de la " + echipaAtac + "!",
         "Interventie salvatoare a fundasului pe linia portii!"
     };
-    static const std::vector<std::string> var = {
+    const std::vector<std::string> var = {
         "Arbitrul consulta VAR... Golul este VALIDAT!",
         "Moment tensionat... Arbitrul merge la monitor... PENALTY pentru " + echipaAtac + "!"
     };
@@ -655,7 +655,7 @@ void meniuTactica() {
 void meniuTransferuri() {
     clear();
     std::cout << "=== PIATA TRANSFERURI ===\nBuget: " << finante.getBalans() << "\n";
-    std::vector<std::string> names = {"Neymar", "Mbappe", "Hagi", "Popescu", "Ronaldo"};
+    std::vector<std::string> names = {"Neymar Jr", "Kylian Mbappe", "Gica Hagi", "Gica Popescu", "Cristiano Ronaldo"};
     for(int i=0; i<5; ++i) {
         int rtg = 70 + rand()%25;
         int pret = rtg * 100000;
@@ -682,7 +682,7 @@ void meniuTransferuri() {
                 citesteNumar(salOpt);
                 if(salOpt == 1) {
                     finante.tranzactie(-oferta, "Transfer");
-                    Jucator* j = JucatorFactory::getInstance().creazaJucator(names[opt-1], "Nou", rtg, "ST", 99);
+                    Jucator* j = JucatorFactory::getInstance().creazaJucator(names[opt-1], " ", rtg, "ST", 99);
                     lot.push_back(std::unique_ptr<Jucator>(j));
                     GameData::getMeta(j).salariuSaptamanal = salariuCerut;
                     sincronizeazaLot();
