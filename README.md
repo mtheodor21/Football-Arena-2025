@@ -1,141 +1,97 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+Football Arena 2025: Destinul Clubului e în Mâinile Tale
 
-### Folosiți template-ul corespunzător grupei voastre!
+Bine ai venit în Football Arena 2025, un simulator complex de management fotbalistic bazat pe text, unde strategia, gestionarea resurselor și flerul tactic fac diferența dintre o echipă campioană și una falimentară.
 
-| Laborant  | Link template                                |
-|-----------|----------------------------------------------|
-| Dragoș B  | https://github.com/Ionnier/oop-template      |
-| Tiberiu M | https://github.com/MaximTiberiu/oop-template |
-| Marius MC | https://github.com/mcmarius/oop-template     |
+În acest joc, preiei frâiele propriului club de fotbal și te lupți pentru supremație în prima ligă împotriva unor rivali de temut, încercând să urci în clasament și să domini competiția internă.
 
-### Important!
+Scopul Jocului
 
-Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar dacă documentați riguros acest proces.
-Codul generat pus "ca să fie"/pe care nu îl înțelegeți se punctează doar pentru puncte bonus, doar în contextul
-în care oferă funcționalități ajutătoare și doar dacă are sens.
+Obiectivul tău nu este doar să câștigi un meci, ci să construiești o dinastie. Succesul se măsoară pe trei planuri:
 
-Codul din proiect trebuie să poată fi ușor de înțeles și de modificat de către altcineva. Pentru detalii, veniți la ore.
+Performanță Sportivă: Câștigarea campionatului și acumularea de puncte în clasament.
 
-O cerință nu se consideră îndeplinită dacă este realizată doar prin cod generat.
+Stabilitate Financiară: Menținerea unui balans pozitiv, gestionarea datoriilor bancare și maximizarea veniturilor.
 
-- **Fără cod de umplutură/fără sens!**
-- **Fără copy-paste!**
-- **Fără variabile globale!**
-- **Fără atribute publice!**
-- **Pentru T2 și T3, fără date în cod!** Datele vor fi citite din fișier, aveți exemple destule.
-- **Obligatoriu** fișiere cu date mai multe din care să citiți, obligatoriu cu biblioteci externe: fișiere (local sau server) sau baze de date
-- obligatoriu (TBD) să integrați cel puțin două biblioteci externe pe lângă cele pentru stocare
+Dezvoltarea Clubului: Creșterea valorii jucătorilor, promovarea talentelor din academie și menținerea unui moral ridicat în vestiar.
 
-### Tema 0
+Ce trebuie să faci? (Gameplay & Mecanici)
 
-- [ ] Nume proiect (poate fi schimbat ulterior)
-- [ ] Scurtă descriere a temei alese, ce v-ați propus să implementați
+Ca manager general, ai control total asupra fiecărui aspect al clubului. Iată principalele tale responsabilități:
 
-## Tema 1
+1. Tactică și Vestiar
 
-#### Cerințe
-- [ ] definirea a minim **3-4 clase** folosind compunere cu clasele definite de voi; moștenirile nu se iau în considerare aici
-- [ ] constructori de inițializare cu parametri pentru fiecare clasă
-- [ ] pentru o aceeași (singură) clasă: constructor de copiere, `operator=` de copiere, destructor
-<!-- - [ ] pentru o altă clasă: constructor de mutare, `operator=` de mutare, destructor -->
-<!-- - [ ] pentru o altă clasă: toate cele 5 funcții membru speciale -->
-- [ ] `operator<<` pentru **toate** clasele pentru afișare (`std::ostream`) folosind compunere de apeluri cu `operator<<`
-- [ ] cât mai multe `const` (unde este cazul) și funcții `private`
-- [ ] implementarea a minim 3 funcții membru publice pentru funcționalități netriviale specifice temei alese, dintre care cel puțin 1-2 funcții mai complexe
-  - nu doar citiri/afișări sau adăugat/șters elemente într-un/dintr-un vector
-- [ ] scenariu de utilizare **cu sens** a claselor definite:
-  - crearea de obiecte și apelarea tuturor funcțiilor membru publice în main
-  - vor fi adăugate în fișierul `tastatura.txt` DOAR exemple de date de intrare de la tastatură (dacă există); dacă aveți nevoie de date din fișiere, creați alte fișiere separat
-- [ ] minim 50-55% din codul propriu să fie C++, `.gitattributes` configurat corect
-- [ ] tag de `git`: de exemplu `v0.1`
-- [ ] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
-- [ ] code review #1 2 proiecte
+Ești "creierul" din spatele echipei. Înainte de fiecare etapă, trebuie să iei decizii cruciale:
 
-## Tema 2
+Primul 11: Selectezi titularii manual sau lași secundul să aleagă automat cei mai buni jucători.
 
-#### Cerințe
-- [ ] separarea codului din clase în `.h` (sau `.hpp`) și `.cpp`
-- [ ] moșteniri:
-  - minim o clasă de bază și **3 clase derivate** din aceeași ierarhie
-  - ierarhia trebuie să fie cu bază proprie, nu derivată dintr-o clasă predefinită
-  - [ ] funcții virtuale (pure) apelate prin pointeri de bază din clasa care conține atributul de tip pointer de bază
-    - minim o funcție virtuală va fi **specifică temei** (i.e. nu simple citiri/afișări sau preluate din biblioteci i.e. draw/update/render)
-    - constructori virtuali (clone): sunt necesari, dar nu se consideră funcții specifice temei
-    - afișare virtuală, interfață non-virtuală
-  - [ ] apelarea constructorului din clasa de bază din constructori din derivate
-  - [ ] clasă cu atribut de tip pointer la o clasă de bază cu derivate; aici apelați funcțiile virtuale prin pointer de bază, eventual prin interfața non-virtuală din bază
-    - [ ] suprascris cc/op= pentru copieri/atribuiri corecte, copy and swap
-    - [ ] `dynamic_cast`/`std::dynamic_pointer_cast` pentru downcast cu sens
-    - [ ] smart pointers (recomandat, opțional)
-- [ ] excepții
-  - [ ] ierarhie proprie cu baza `std::exception` sau derivată din `std::exception`; minim **3** clase pentru erori specifice distincte
-    - clasele de excepții trebuie să trateze categorii de erori distincte (exemplu de erori echivalente: citire fișiere cu diverse extensii)
-  - [ ] utilizare cu sens: de exemplu, `throw` în constructor (sau funcție care întoarce un obiect), `try`/`catch` în `main`
-  - această ierarhie va fi complet independentă de ierarhia cu funcții virtuale
-- [ ] funcții și atribute `static`
-- [ ] STL
-- [ ] cât mai multe `const`
-- [ ] funcții *de nivel înalt*, de eliminat cât mai mulți getters/setters/funcții low-level
-- [ ] minim 75-80% din codul propriu să fie C++
-- [ ] la sfârșit: commit separat cu adăugarea unei noi clase derivate fără a modifica restul codului, **pe lângă cele 3 derivate deja adăugate** din aceeași ierarhie
-  - noua derivată nu poate fi una existentă care a fost ștearsă și adăugată din nou
-  - noua derivată va fi integrată în codul existent (adică va fi folosită, nu adăugată doar ca să fie)
-- [ ] tag de `git` pe commit cu **toate bifele**: de exemplu `v0.2`
-- [ ] code review #2 2 proiecte
+Sistemul de Joc: Alegi așezarea în teren (4-4-2 Clasic, 4-3-3 Ofensiv, 3-5-2 Modern, etc.).
 
-## Tema 3
+Stilul de Joc: Adaptezi strategia la adversar. Poți juca Tiki-Taka pentru posesie, Gegenpress pentru agresivitate, sau poți face Park the Bus dacă vrei să aperi un rezultat.
 
-#### Cerințe
-- [ ] 2 șabloane de proiectare (design patterns)
-- [ ] o clasă șablon cu sens; minim **2 instanțieri**
-  - [ ] preferabil și o funcție șablon (template) cu sens; minim 2 instanțieri
-- [ ] minim 85% din codul propriu să fie C++
-<!-- - [ ] o specializare pe funcție/clasă șablon -->
-- [ ] tag de `git` pe commit cu **toate bifele**: de exemplu `v0.3` sau `v1.0`
-- [ ] code review #3 2 proiecte
+Managementul Jucătorilor: Trebuie să fii atent la Condiția Fizică și Moral. Un jucător obosit sau demoralizat va avea performanțe slabe, indiferent de ratingul său.
 
-## Instrucțiuni de compilare
+2. Biroul Financiar
 
-Proiectul este configurat cu CMake.
+Fotbalul modern înseamnă afaceri. Dacă rămâi fără bani, clubul intră în colaps.
 
-Instrucțiuni pentru terminal:
+Buget: Gestionezi un buget inițial pe care îl poți spori prin victorii și sponsori.
 
-1. Pasul de configurare
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-# sau ./scripts/cmake.sh configure
-```
+Bilete: Tu stabilești prețul biletelor. Un preț prea mare alungă fanii, un preț prea mic reduce profitul. Numărul spectatorilor depinde de preț și de popularitatea clubului.
 
-Sau pe Windows cu GCC folosind Git Bash:
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -G Ninja
-# sau ./scripts/cmake.sh configure -g Ninja
-```
+Bănci și Împrumuturi: Poți contracta credite bancare pentru investiții majore, dar atenție la rata săptămânală și dobânzi!
 
-La acest pas putem cere să generăm fișiere de proiect pentru diverse medii de lucru.
+Salarii: Trebuie să plătești săptămânal salariile jucătorilor și staff-ului.
 
+3. Piața de Transferuri (Mercato)
 
-2. Pasul de compilare
-```sh
-cmake --build build --config Debug --parallel 6
-# sau ./scripts/cmake.sh build
-```
+Vrei vedete? Trebuie să plătești.
 
-Cu opțiunea `parallel` specificăm numărul de fișiere compilate în paralel.
+Poți negocia transferul unor superstaruri.
 
+Negocierea implică atât suma de transfer plătită clubului, cât și salariul cerut de jucător.
 
-3. Pasul de instalare (opțional)
-```sh
-cmake --install build --config Debug --prefix install_dir
-# sau ./scripts/cmake.sh install
-```
+Trebuie să te asiguri că ai fonduri suficiente înainte de a face o ofertă, altfel vei fi refuzat.
 
-Vezi și [`scripts/cmake.sh`](scripts/cmake.sh).
+4. Academia de Juniori
 
-Observație: folderele `build/` și `install_dir/` sunt adăugate în fișierul `.gitignore` deoarece
-conțin fișiere generate și nu ne ajută să le versionăm.
+Viitorul clubului stă în tineri.
 
+Ai o academie U19 unde poți descoperi noi talente.
 
-## Resurse
+Poți organiza Trial-uri (contra cost) pentru a găsi jucători cu potențial uriaș.
 
-- adăugați trimiteri **detaliate** către resursele externe care v-au ajutat sau pe care le-ați folosit
+Jucătorii promovați la prima echipă pot deveni titulari de bază sau pot fi vânduți pentru profit.
+
+5. Staff-ul Tehnic și Medical
+
+Nu ești singur.
+
+Medicii: Sunt esențiali când apar accidentări. Un medic cu skill mare va reduce timpul de indisponibilitate al jucătorilor accidentați.
+
+Antrenorii Secunzi: Contribuie la eficiența generală a echipei și la antrenamente.
+
+Ziua Meciului (Match Day)
+
+Când începe meciul, intri în febra competiției. Meciurile sunt simulate minut cu minut, oferind un comentariu text dinamic:
+
+Evenimente: Vezi ocazii de gol, bare, intervenții eroice ale portarilor și decizii VAR tensionate.
+
+Accidentări: Jucătorii se pot accidenta în timp real, obligându-te la schimbări și afectând puterea echipei.
+
+Rezultat: Scorul final influențează clasamentul, moralul echipei, încrederea conducerii și popularitatea în rândul fanilor.
+
+News Feed (Ziarul)
+
+Jocul include un sistem dinamic de știri ("News Feed") care te ține la curent cu tot ce mișcă în universul jocului:
+
+Rezultate șocante.
+
+Transferuri realizate.
+
+Mișcări financiare majore.
+
+Declarații și evenimente "Breaking News".
+
+Football Arena 2025 este un test de leadership. Ai răbdarea să crești o echipă tânără sau vei risca totul pe transferuri scumpe? Vei fi un manager iubit de fani sau unul care pune profitul pe primul loc?
+
+Succes, Mister!
